@@ -11,7 +11,8 @@ import Player from "../types/Player"
 import GameState from "../types/GameState"
 import { BlockItem } from "../types/Cards"
 import { cardSelected } from "../utils/mapHelper"
-import { selectedBlock } from '../utils/cardHelper'
+import { selectedBlock, selectedUnblock } from '../utils/cardHelper'
+import { moveSyntheticComments } from "typescript"
 
 const drawerWidth = 240
 
@@ -40,12 +41,17 @@ const drawPileText = (amount: number): string => "Drawpile (" + amount + ")"
 
 const discardPileText = (amount: number): string => "Discardpile (" + amount + ")"
 
+const canClick = (G: GameState, ctx: Ctx, index: number): boolean => {
+  return selectedBlock(G, ctx) || selectedUnblock(G, ctx)
+}
+
+
 const playerText = (player: Player): string => {
   let output: string = player.name
   const items = [
     { l: "P", b: BlockItem.Pickaxe },
     { l: "C", b: BlockItem.Cart },
-    { l: "P", b: BlockItem.Lamp },
+    { l: "L", b: BlockItem.Lamp },
   ]
 
   items.forEach((item: any) => {
@@ -58,6 +64,16 @@ const playerText = (player: Player): string => {
 
 const PlayerList: React.FC<PlayerListProps> = ({ G, ctx, moves }) => {
   const classes = useStyles()
+  const playerClick = (G: GameState, ctx: Ctx, index: number) => {
+    if (selectedBlock(G, ctx)) {
+      moves.blockPlayer(index)
+      return
+    }
+    if (selectedUnblock(G, ctx)) {
+      moves.unBlockPlayer(index)
+    }
+
+  }
 
   return (
     <Drawer
@@ -92,10 +108,10 @@ const PlayerList: React.FC<PlayerListProps> = ({ G, ctx, moves }) => {
           {G.players.map((player: Player, index: number) => (
             <ListItem
               key={index}
-              selected={index === Number(ctx.currentPlayer) || selectedBlock(G, ctx)}
+              selected={index === Number(ctx.currentPlayer) || canClick(G, ctx, index)}
               onClick={
-                selectedBlock(G, ctx)
-                  ? () => { moves.blockPlayer(index) }
+                canClick(G, ctx, index)
+                  ? () => { playerClick(G, ctx, index) }
                   : undefined
               }
             >

@@ -9,6 +9,7 @@ import { endTurn } from "../utils/eventHelper"
 import { goldDiscovered } from '../utils/mapHelper'
 import generateRoles from '../generators/rolecards'
 import { flipSide, getSelectedCard, getSelectedCardType } from '../utils/cardHelper'
+import { Coordinate } from '../types/Map'
 
 const Play = {
   next: 'start',
@@ -87,9 +88,6 @@ const Play = {
         return
       }
       if (index in G.players[currentPlayer].cards) {
-        if (G.players[currentPlayer].blockers.length > 0 && G.players[currentPlayer].cards[index].type !== CardType.Action) {
-          return INVALID_MOVE
-        }
         G.players[currentPlayer].selectedCard = index
         return
       }
@@ -99,6 +97,9 @@ const Play = {
       const currentPlayer = Number(ctx.currentPlayer)
       const selectedCard = G.players[currentPlayer].selectedCard
       if (selectedCard === undefined) {
+        return INVALID_MOVE
+      }
+      if (G.players[currentPlayer].blockers.length > 0) {
         return INVALID_MOVE
       }
 
@@ -140,7 +141,22 @@ const Play = {
       }
       G.players[playerId].blockers.push(selectedCard.blockItems[0])
       Play.moves.discardCard(G, ctx)
-    }
+    },
+    unBlockPlayer: (G: GameState, ctx: Ctx, playerId: number) => {
+      const selectedCard = getSelectedCard(G, ctx)
+
+      if (selectedCard === undefined || selectedCard.type !== CardType.Action || selectedCard.action !== Action.Unblock || selectedCard.blockItems === undefined) {
+        return INVALID_MOVE
+      }
+      const blockerIndex = G.players[playerId].blockers.findIndex(b => selectedCard.blockItems?.includes(b))
+      if (blockerIndex === -1) {
+        return INVALID_MOVE
+      }
+      G.players[playerId].blockers.splice(blockerIndex, 1)
+      Play.moves.discardCard(G, ctx)
+    },
+    peek: (G: GameState, ctx: Ctx, coords: Coordinate) => { },
+    destroy: (G: GameState, ctx: Ctx, coords: Coordinate) => { },
   },
 }
 
