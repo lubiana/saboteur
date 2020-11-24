@@ -11,6 +11,7 @@ import Player from "../types/Player"
 import GameState from "../types/GameState"
 import { BlockItem } from "../types/Cards"
 import { cardSelected } from "../utils/mapHelper"
+import { selectedBlock } from '../utils/cardHelper'
 
 const drawerWidth = 240
 
@@ -78,8 +79,8 @@ const PlayerList: React.FC<PlayerListProps> = ({ G, ctx, moves }) => {
             onClick={
               cardSelected(G, ctx)
                 ? () => {
-                    moves.discardCard(G, ctx)
-                  }
+                  moves.discardCard(G, ctx)
+                }
                 : undefined
             }
           >
@@ -89,7 +90,15 @@ const PlayerList: React.FC<PlayerListProps> = ({ G, ctx, moves }) => {
         <List>
           <Divider />
           {G.players.map((player: Player, index: number) => (
-            <ListItem key={index} selected={index === Number(ctx.currentPlayer)}>
+            <ListItem
+              key={index}
+              selected={index === Number(ctx.currentPlayer) || selectedBlock(G, ctx)}
+              onClick={
+                selectedBlock(G, ctx)
+                  ? () => { moves.blockPlayer(index) }
+                  : undefined
+              }
+            >
               <ListItemText primary={playerText(player)} />
             </ListItem>
           ))}

@@ -2,13 +2,13 @@ import { Ctx } from "boardgame.io"
 import GameState from "../types/GameState"
 import Player from "../types/Player"
 import { generateCards, endTiles } from "../generators/cardgen"
-import { HandCard, EndTile, CardType, Role } from "../types/Cards"
+import { HandCard, EndTile, CardType, Role, Action } from '../types/Cards'
 import mapGen from "../generators/mapgen"
 import { INVALID_MOVE } from "boardgame.io/core"
 import { endTurn } from "../utils/eventHelper"
 import { goldDiscovered } from '../utils/mapHelper'
 import generateRoles from '../generators/rolecards'
-import { flipSide } from '../utils/cardHelper'
+import { flipSide, getSelectedCard, getSelectedCardType } from '../utils/cardHelper'
 
 const Play = {
   next: 'start',
@@ -87,6 +87,9 @@ const Play = {
         return
       }
       if (index in G.players[currentPlayer].cards) {
+        if (G.players[currentPlayer].blockers.length > 0 && G.players[currentPlayer].cards[index].type !== CardType.Action) {
+          return INVALID_MOVE
+        }
         G.players[currentPlayer].selectedCard = index
         return
       }
@@ -129,6 +132,15 @@ const Play = {
 
       card.openSides = card.openSides.map(v => flipSide(v))
     },
+    blockPlayer: (G: GameState, ctx: Ctx, playerId: number) => {
+      const selectedCard = getSelectedCard(G, ctx)
+
+      if (selectedCard === undefined || selectedCard.type !== CardType.Action || selectedCard.action !== Action.Block || selectedCard.blockItems === undefined) {
+        return INVALID_MOVE
+      }
+      G.players[playerId].blockers.push(selectedCard.blockItems[0])
+      Play.moves.discardCard(G, ctx)
+    }
   },
 }
 
