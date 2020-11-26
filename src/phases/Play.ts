@@ -6,7 +6,7 @@ import { HandCard, EndTile, CardType, Role, Action } from '../types/Cards'
 import mapGen from "../generators/mapgen"
 import { INVALID_MOVE } from "boardgame.io/core"
 import { endTurn } from "../utils/eventHelper"
-import { goldDiscovered } from '../utils/mapHelper'
+import { goldDiscovered, canDestroyCard, removeCardFromMap, updateEndTiles } from '../utils/mapHelper'
 import generateRoles from '../generators/rolecards'
 import { flipSide, getSelectedCard, getSelectedCardType } from '../utils/cardHelper'
 import { Coordinate } from '../types/Map'
@@ -61,6 +61,9 @@ const Play = {
       return false
     }
     return !G.players.some((player: Player) => player.cards.length > 0)
+  },
+  turn: {
+    onBegin: updateEndTiles
   },
   moves: {
     discardCard: (G: GameState, ctx: Ctx) => {
@@ -155,8 +158,19 @@ const Play = {
       G.players[playerId].blockers.splice(blockerIndex, 1)
       Play.moves.discardCard(G, ctx)
     },
-    peek: (G: GameState, ctx: Ctx, coords: Coordinate) => { },
-    destroy: (G: GameState, ctx: Ctx, coords: Coordinate) => { },
+    destroyCard: (G: GameState, ctx: Ctx, coord: Coordinate) => {
+      if (!canDestroyCard(G, ctx, coord)) {
+        return INVALID_MOVE
+      }
+
+      G = removeCardFromMap(G, ctx, coord)
+
+      Play.moves.discardCard(G, ctx)
+    },
+    peek: (G: GameState, ctx: Ctx, coords: Coordinate) => {
+      G.players[Number(ctx.currentPlayer)].peekedCoords.push(coords)
+      Play.moves.discardCard(G, ctx)
+    },
   },
 }
 

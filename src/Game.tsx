@@ -1,7 +1,6 @@
 import Start from "./phases/Start"
 import GameState from "./types/GameState"
 import Play from "./phases/Play"
-import { Ctx } from 'boardgame.io'
 
 const Saboteur = {
   name: "Saboteur",
@@ -17,6 +16,7 @@ const Saboteur = {
           role: null,
           cards: [],
           blockers: [],
+          peekedCoords: [],
         },
         {
           name: "du",
@@ -25,6 +25,7 @@ const Saboteur = {
           role: null,
           cards: [],
           blockers: [],
+          peekedCoords: [],
         },
         {
           name: "ich",
@@ -33,6 +34,7 @@ const Saboteur = {
           role: null,
           cards: [],
           blockers: [],
+          peekedCoords: [],
         },
       ],
       drawPile: [],

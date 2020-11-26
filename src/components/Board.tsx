@@ -10,9 +10,6 @@ import GameState from "../types/GameState"
 import PlayerList from "./PlayerList"
 import PlayerView from "./PlayerView"
 import MapView from "./MapView"
-import { Grid } from "@material-ui/core"
-import { CardType } from '../types/Cards'
-import SaboteurCard from "./SaboteurCard"
 
 const drawerWidth = 240
 
@@ -64,15 +61,6 @@ const Board: React.FC<BoardProps> = ({ ctx, G, moves, playerID }) => {
         <Toolbar />
         <div>
           {ctx.phase === "start" && <RoleCardPicker roleCards={G.roleCards} moves={moves} />}
-          <Grid container spacing={2}>
-            {G.drawPile.filter((card) => card.type === CardType.Path).map((item, index) => {
-              return (
-                <Grid item key={index}>
-                  <SaboteurCard card={item} />
-                </Grid>
-              )
-            })}
-          </Grid>
           {G.map.items.length !== 0 && <MapView G={G} ctx={ctx} moves={moves} />}
           <PlayerView player={G.players[Number(ctx.currentPlayer)]} moves={moves} />
         </div>

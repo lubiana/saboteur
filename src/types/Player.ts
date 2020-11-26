@@ -1,4 +1,5 @@
 import { Role, HandCard, BlockItem } from "./Cards"
+import { Coordinate } from './Map'
 
 export default interface Player {
   name: string
@@ -8,6 +9,7 @@ export default interface Player {
   cards: HandCard[]
   blockers: BlockItem[]
   selectedCard?: number
+  peekedCoords: Coordinate[]
 }
 
 export const player1: Player = {
@@ -17,4 +19,5 @@ export const player1: Player = {
   role: null,
   cards: [],
   blockers: [],
+  peekedCoords: [],
 }

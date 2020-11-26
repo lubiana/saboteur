@@ -12,7 +12,6 @@ import GameState from "../types/GameState"
 import { BlockItem } from "../types/Cards"
 import { cardSelected } from "../utils/mapHelper"
 import { selectedBlock, selectedUnblock } from '../utils/cardHelper'
-import { moveSyntheticComments } from "typescript"
 
 const drawerWidth = 240
 

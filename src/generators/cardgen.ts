@@ -88,20 +88,20 @@ export const endTiles = (): [EndTile, EndTile, EndTile] => [
     gold: false,
     openSides: [OpenSide.Down, OpenSide.Right, OpenSide.Left, OpenSide.Up],
     deadEnd: false,
-    uncovered: true,
+    uncovered: false,
   },
   {
     type: CardType.End,
     gold: false,
     openSides: [OpenSide.Down, OpenSide.Right, OpenSide.Left, OpenSide.Up],
     deadEnd: false,
-    uncovered: true,
+    uncovered: false,
   },
   {
     type: CardType.End,
     gold: true,
     openSides: [OpenSide.Down, OpenSide.Right, OpenSide.Left, OpenSide.Up],
     deadEnd: false,
-    uncovered: true,
+    uncovered: false,
   },
 ]

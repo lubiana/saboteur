@@ -2,8 +2,8 @@ import { Map, MapItem, Coordinate } from '../types/Map'
 import GameState from '../types/GameState'
 import { Ctx } from "boardgame.io"
 import Player from "../types/Player"
-import { CardType, OpenSide, HandCard, PathTile } from '../types/Cards'
-import { coordForSide } from "./cardHelper"
+import { CardType, OpenSide, HandCard, PathTile, Action } from '../types/Cards'
+import { coordForSide, getSelectedCard } from './cardHelper'
 
 export interface mapBounddaries {
   minX: number
@@ -30,17 +30,23 @@ export const cardSelected = (G: GameState, ctx: Ctx, mapTile: boolean = false): 
   return true
 }
 
-const findMapItem = (coord: Coordinate, map: MapItem[]): MapItem | undefined => {
-  return map.find((item) => item.coords.x === coord.x && item.coords.y === coord.y)
+const getMapItemIndex = (coord: Coordinate, map: MapItem[]): number => {
+  return map.findIndex(item => item.coords.x === coord.x && item.coords.y === coord.y)
 }
 
-const getSelectedCard = (G: GameState, ctx: Ctx): PathTile | undefined => {
-  const player: Player = G.players[Number(ctx.currentPlayer)]
-  if (player.selectedCard === undefined) {
+const getMapItem = (coord: Coordinate, map: MapItem[]): MapItem | undefined => {
+  const index = getMapItemIndex(coord, map)
+  if (index === -1) {
     return undefined
   }
+  return map[index]
+}
 
-  const card: HandCard = player.cards[player.selectedCard]
+const getSelectedPathTile = (G: GameState, ctx: Ctx): PathTile | undefined => {
+  const card = getSelectedCard(G, ctx)
+  if (card === undefined) {
+    return card
+  }
   if ("openSides" in card) {
     return card
   }
@@ -90,7 +96,7 @@ export const canPlaceCard = (G: GameState, ctx: Ctx, x: number, y: number): bool
     return false
   }
 
-  const selectedCard = getSelectedCard(G, ctx)
+  const selectedCard = getSelectedPathTile(G, ctx)
   if (selectedCard === undefined) {
     return false
   }
@@ -105,7 +111,14 @@ export const canPlaceCard = (G: GameState, ctx: Ctx, x: number, y: number): bool
 
   const siblingCards = getSiblingCards(getSiblings(x, y), G.map.items)
 
-  if (siblingCards.every((sibling) => sibling.card.type === CardType.End || sibling.card.deadEnd === true)) {
+  const validSibling = (sibling: MapItem): boolean => {
+    if ('uncovered' in sibling.card && !sibling.card.uncovered) {
+      return true
+    }
+    return sibling.card.deadEnd
+  }
+
+  if (siblingCards.every(validSibling)) {
     return false
   }
 
@@ -126,6 +139,20 @@ export const canPlaceCard = (G: GameState, ctx: Ctx, x: number, y: number): bool
   })
 }
 
+export const updateEndTiles = (G: GameState, ctx: Ctx): GameState => {
+  G.map.items.map((i) => {
+    if (!('uncovered' in i.card)) {
+      return i
+    }
+    if (i.card.uncovered === true) {
+      return i
+    }
+    i.card.uncovered = pathToZero(i.coords, i.card.openSides, G.map.items)
+    return i
+  })
+  return G
+}
+
 const pathToZero = (coords: Coordinate, sides: OpenSide[], map: MapItem[], prev: Coordinate[] = []): boolean => {
   if (coords.x === 0 && coords.y === 0) {
     return true
@@ -141,7 +168,7 @@ const pathToZero = (coords: Coordinate, sides: OpenSide[], map: MapItem[], prev:
       return {
         side: side,
         coord: coord,
-        mapItem: findMapItem(coord, map),
+        mapItem: getMapItem(coord, map),
       }
     })
     .filter((value) => {
@@ -222,6 +249,59 @@ export const goldDiscovered = (G: GameState): boolean => {
     return false
   }
   return pathToZero(goldCard.coords, goldCard.card.openSides, G.map.items, [])
+}
+
+export const removeCardFromMap = (G: GameState, ctx: Ctx, coord: Coordinate): GameState => {
+  const cardIndex = getMapItemIndex(coord, G.map.items)
+  G.map.items.splice(cardIndex, 1)
+  return G
+}
+
+export const canPeekCard = (G: GameState, ctx: Ctx, coord: Coordinate): boolean => {
+  const selectedCard = getSelectedCard(G, ctx)
+  if (selectedCard === undefined) {
+    return false
+  }
+  if (selectedCard.type !== CardType.Action) {
+    return false
+  }
+  if (selectedCard.action !== Action.Peek) {
+    return false
+  }
+  const mapCard = getMapItem(coord, G.map.items)
+  if (mapCard === undefined) {
+    return false
+  }
+
+  if (mapCard.card.type === CardType.End) {
+    return true
+  }
+
+  return false
+}
+
+export const canDestroyCard = (G: GameState, ctx: Ctx, coord: Coordinate): boolean => {
+  const selectedCard = getSelectedCard(G, ctx)
+  if (selectedCard === undefined) {
+    return false
+  }
+  if (selectedCard.type !== CardType.Action) {
+    return false
+  }
+  if (selectedCard.action !== Action.Destroy) {
+    return false
+  }
+
+  const mapCard = getMapItem(coord, G.map.items)
+  if (mapCard === undefined) {
+    return false
+  }
+
+  if (mapCard.card.type === CardType.Path) {
+    return true
+  }
+
+  return false
 }
 
 export default getBoundaries

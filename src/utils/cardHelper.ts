@@ -1,5 +1,5 @@
 import { Coordinate } from '../types/Map'
-import { OpenSide, HandCard, CardType, BlockItem, Action } from '../types/Cards'
+import { OpenSide, HandCard, CardType, Action } from '../types/Cards'
 import GameState from '../types/GameState'
 import { Ctx } from 'boardgame.io'
 import Player from '../types/Player'
