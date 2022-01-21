@@ -17,10 +17,10 @@ const flipCard = (G: GameState, ctx: Ctx) => {
 
 const flipSide = (side: OpenSide): OpenSide => {
   switch (side) {
-    case OpenSide.Up: return OpenSide.Down
-    case OpenSide.Down: return OpenSide.Up
-    case OpenSide.Left: return OpenSide.Right
-    case OpenSide.Right: return OpenSide.Left
+    case "Up": return "Down"
+    case "Down": return "Up"
+    case "Left": return "Right"
+    case "Right": return "Left"
   }
 }
 

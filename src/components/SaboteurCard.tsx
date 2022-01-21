@@ -6,7 +6,7 @@ import {isToolActionCard, isMapCard, isRoleCard, isMapActionCard} from "../types
 
 interface SaboteurCardProps {
   card: SabCard
-  onClick: () => void
+  onClick?: () => void
   elevation?: number
 }
 

@@ -1,6 +1,6 @@
 import React from "react"
 import Grid from "@material-ui/core/Grid"
-import { CardType, Role, RoleCard } from "../types/Cards"
+import {RoleCard} from "../types/Cards"
 import SaboteurCard from "./SaboteurCard"
 
 interface RoleCardPickerProps {
@@ -13,7 +13,7 @@ const RoleCardPicker: React.FC<RoleCardPickerProps> = ({ roleCards, moves }) => 
     {roleCards.map((card: RoleCard, index: number) => (
       <Grid item key={index}>
         <SaboteurCard
-          card={{ type: CardType.Role, role: Role.Undecided }}
+          card={{ type: "Role", role: "?" }}
           onClick={() => {
             moves.pickRoleCard(index)
           }}

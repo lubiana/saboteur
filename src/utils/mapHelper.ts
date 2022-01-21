@@ -141,10 +141,10 @@ export const pathToZero = (slot: Slot, sides: OpenSide[], map: MapItem[], prev: 
 
 const slotForSide = (slot: Slot, side: OpenSide): Slot => {
   switch (side) {
-    case OpenSide.Up: return { x: slot.x, y: slot.y - 1 }
-    case OpenSide.Down: return { x: slot.x, y: slot.y + 1 }
-    case OpenSide.Left: return { x: slot.x - 1, y: slot.y }
-    case OpenSide.Right: return { x: slot.x + 1, y: slot.y }
+    case "Up": return { x: slot.x, y: slot.y - 1 }
+    case "Down": return { x: slot.x, y: slot.y + 1 }
+    case "Left": return { x: slot.x - 1, y: slot.y }
+    case "Right": return { x: slot.x + 1, y: slot.y }
   }
 }
 
@@ -160,15 +160,15 @@ const mapItemToCompareItem = (item: MapItem): CompareItem => {
 const compatible = (a: CompareItem, b: CompareItem, noneAllowed: boolean = true): boolean => {
   if (a.slot.x === b.slot.x) {
     if (a.slot.y > b.slot.y) {
-      return checkSides(b.sides, a.sides, OpenSide.Down, OpenSide.Up, noneAllowed)
+      return checkSides(b.sides, a.sides, "Down", "Up", noneAllowed)
     }
-    return checkSides(b.sides, a.sides, OpenSide.Up, OpenSide.Down, noneAllowed)
+    return checkSides(b.sides, a.sides, "Up", "Down", noneAllowed)
   }
   if (a.slot.y === b.slot.y) {
     if (a.slot.x > b.slot.x) {
-      return checkSides(b.sides, a.sides, OpenSide.Right, OpenSide.Left, noneAllowed)
+      return checkSides(b.sides, a.sides, "Right", "Left", noneAllowed)
     }
-    return checkSides(b.sides, a.sides, OpenSide.Left, OpenSide.Right, noneAllowed)
+    return checkSides(b.sides, a.sides, "Left", "Right", noneAllowed)
   }
   return false
 }

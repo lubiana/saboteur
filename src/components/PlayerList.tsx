@@ -47,9 +47,9 @@ const canClick = (G: GameState, ctx: Ctx): boolean =>
 const playerText = (player: Player): string => {
   let output: string = player.name
   const items = [
-    {l: "P", b: Tool.Pickaxe},
-    {l: "C", b: Tool.Cart},
-    {l: "L", b: Tool.Lamp},
+    {l: "P", b: "Pickaxe"},
+    {l: "C", b: "Cart"},
+    {l: "L", b: "Lamp"},
   ]
 
   items.forEach((item: any) => {

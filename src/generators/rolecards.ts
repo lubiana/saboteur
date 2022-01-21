@@ -1,4 +1,4 @@
-import { CardType, Role, RoleCard } from "../types/Cards"
+import {RoleCard} from "../types/Cards"
 
 const generateRoles = (numPlayers: number): RoleCard[] => {
   const roles: RoleCard[] = []
@@ -19,15 +19,15 @@ const generateRoles = (numPlayers: number): RoleCard[] => {
 
   for (let i = 0; i < saboteurs; i++) {
     roles.push({
-      type: CardType.Role,
-      role: Role.Saboteur,
+      type: "Role",
+      role: "Saboteur",
     })
   }
 
   for (let i = 0; i < diggers; i++) {
     roles.push({
-      type: CardType.Role,
-      role: Role.Digger,
+      type: "Role",
+      role: "Digger",
     })
   }
 

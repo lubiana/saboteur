@@ -1,14 +1,13 @@
 import {
-  Action,
   ActionCard,
-  CardType,
   EndTile,
   HandCard,
   MapAction,
   MapActionCard,
   OpenSide,
   PathTile,
-  Tool, ToolAction,
+  Tool,
+  ToolAction,
   ToolActionCard
 } from "../types/Cards"
 
@@ -16,7 +15,7 @@ const pathTileGenerator = (amount: number, deadEnd: boolean, sides: OpenSide[]):
   const pathTiles: PathTile[] = []
   for (let index = 0; index < amount; index++) {
     pathTiles.push({
-      type: CardType.Path,
+      type: "Path",
       openSides: sides,
       deadEnd,
     })
@@ -28,63 +27,56 @@ const mapActionCard = (amount: number, action: MapAction): MapActionCard[] => {
   const cards: MapActionCard[] = []
 
   for (let index = 0; index < amount; index++) {
-    cards.push({
-      type: CardType.Action,
-      action,
-    })
+    cards.push({type: "Action", action})
   }
   return cards
 }
 
-const toolActionCard = (amount: number, action: ToolAction, blockItems: Tool[] = []): ActionCard[] => {
+const toolActionCard = (amount: number, action: ToolAction, tools: Tool[] = []): ActionCard[] => {
   const cards: ToolActionCard[] = []
 
   for (let index = 0; index < amount; index++) {
-    cards.push({
-      type: CardType.Action,
-      action,
-      tools: blockItems
-    })
+    cards.push({type: "Action", action, tools})
   }
   return cards
 }
 
 const actionCards = (): ActionCard[] => {
   const actionCards: ActionCard[] = []
-  actionCards.push(...mapActionCard(6, Action.Peek))
-  actionCards.push(...mapActionCard(3, Action.Destroy))
-  actionCards.push(...toolActionCard(3, Action.Block, [Tool.Cart]))
-  actionCards.push(...toolActionCard(3, Action.Block, [Tool.Lamp]))
-  actionCards.push(...toolActionCard(3, Action.Block, [Tool.Pickaxe]))
-  actionCards.push(...toolActionCard(2, Action.Unblock, [Tool.Cart]))
-  actionCards.push(...toolActionCard(2, Action.Unblock, [Tool.Lamp]))
-  actionCards.push(...toolActionCard(2, Action.Unblock, [Tool.Pickaxe]))
-  actionCards.push(...toolActionCard(1, Action.Unblock, [Tool.Cart, Tool.Lamp]))
-  actionCards.push(...toolActionCard(1, Action.Unblock, [Tool.Cart, Tool.Pickaxe]))
-  actionCards.push(...toolActionCard(1, Action.Unblock, [Tool.Lamp, Tool.Pickaxe]))
+  actionCards.push(...mapActionCard(6, "Peek"))
+  actionCards.push(...mapActionCard(3, "Destroy"))
+  actionCards.push(...toolActionCard(3, "Block", ["Cart"]))
+  actionCards.push(...toolActionCard(3, "Block", ["Lamp"]))
+  actionCards.push(...toolActionCard(3, "Block", ["Pickaxe"]))
+  actionCards.push(...toolActionCard(2, "Unblock", ["Cart"]))
+  actionCards.push(...toolActionCard(2, "Unblock", ["Lamp"]))
+  actionCards.push(...toolActionCard(2, "Unblock", ["Pickaxe"]))
+  actionCards.push(...toolActionCard(1, "Unblock", ["Cart", "Lamp"]))
+  actionCards.push(...toolActionCard(1, "Unblock", ["Cart", "Pickaxe"]))
+  actionCards.push(...toolActionCard(1, "Unblock", ["Lamp", "Pickaxe"]))
   return actionCards
 }
 
 const pathTiles = (): PathTile[] => {
   const pathTiles: PathTile[] = []
   // deadEnds
-  pathTiles.push(...pathTileGenerator(1, true, [OpenSide.Left, OpenSide.Up]))
-  pathTiles.push(...pathTileGenerator(1, true, [OpenSide.Down, OpenSide.Up]))
-  pathTiles.push(...pathTileGenerator(1, true, [OpenSide.Down, OpenSide.Left]))
-  pathTiles.push(...pathTileGenerator(1, true, [OpenSide.Down, OpenSide.Left, OpenSide.Right, OpenSide.Up]))
-  pathTiles.push(...pathTileGenerator(1, true, [OpenSide.Left]))
-  pathTiles.push(...pathTileGenerator(1, true, [OpenSide.Down]))
-  pathTiles.push(...pathTileGenerator(1, true, [OpenSide.Left, OpenSide.Right]))
-  pathTiles.push(...pathTileGenerator(1, true, [OpenSide.Left, OpenSide.Right, OpenSide.Up]))
-  pathTiles.push(...pathTileGenerator(1, true, [OpenSide.Left, OpenSide.Down, OpenSide.Up]))
+  pathTiles.push(...pathTileGenerator(1, true, ["Left", "Up"]))
+  pathTiles.push(...pathTileGenerator(1, true, ["Down", "Up"]))
+  pathTiles.push(...pathTileGenerator(1, true, ["Down", "Left"]))
+  pathTiles.push(...pathTileGenerator(1, true, ["Down", "Left", "Right", "Up"]))
+  pathTiles.push(...pathTileGenerator(1, true, ["Left"]))
+  pathTiles.push(...pathTileGenerator(1, true, ["Down"]))
+  pathTiles.push(...pathTileGenerator(1, true, ["Left", "Right"]))
+  pathTiles.push(...pathTileGenerator(1, true, ["Left", "Right", "Up"]))
+  pathTiles.push(...pathTileGenerator(1, true, ["Left", "Down", "Up"]))
   // normalPaths
-  pathTiles.push(...pathTileGenerator(3, false, [OpenSide.Left, OpenSide.Right]))
-  pathTiles.push(...pathTileGenerator(4, false, [OpenSide.Down, OpenSide.Up]))
-  pathTiles.push(...pathTileGenerator(5, false, [OpenSide.Down, OpenSide.Left]))
-  pathTiles.push(...pathTileGenerator(5, false, [OpenSide.Left, OpenSide.Up]))
-  pathTiles.push(...pathTileGenerator(5, false, [OpenSide.Down, OpenSide.Up, OpenSide.Left]))
-  pathTiles.push(...pathTileGenerator(5, false, [OpenSide.Down, OpenSide.Right, OpenSide.Left]))
-  pathTiles.push(...pathTileGenerator(5, false, [OpenSide.Down, OpenSide.Right, OpenSide.Left, OpenSide.Up]))
+  pathTiles.push(...pathTileGenerator(3, false, ["Left", "Right"]))
+  pathTiles.push(...pathTileGenerator(4, false, ["Down", "Up"]))
+  pathTiles.push(...pathTileGenerator(5, false, ["Down", "Left"]))
+  pathTiles.push(...pathTileGenerator(5, false, ["Left", "Up"]))
+  pathTiles.push(...pathTileGenerator(5, false, ["Down", "Up", "Left"]))
+  pathTiles.push(...pathTileGenerator(5, false, ["Down", "Right", "Left"]))
+  pathTiles.push(...pathTileGenerator(5, false, ["Down", "Right", "Left", "Up"]))
   return pathTiles
 }
 
@@ -96,7 +88,7 @@ export const generateCards = (): HandCard[] => {
 
 export const emptyCard = (): PathTile => {
   return {
-    type: CardType.Path,
+    type: "Path",
     openSides: [],
     deadEnd: false,
   }
@@ -104,23 +96,23 @@ export const emptyCard = (): PathTile => {
 
 export const endTiles = (): [EndTile, EndTile, EndTile] => [
   {
-    type: CardType.End,
+    type: "End",
     gold: false,
-    openSides: [OpenSide.Down, OpenSide.Right, OpenSide.Left, OpenSide.Up],
+    openSides: ["Down", "Right", "Left", "Up"],
     deadEnd: false,
     uncovered: false,
   },
   {
-    type: CardType.End,
+    type: "End",
     gold: false,
-    openSides: [OpenSide.Down, OpenSide.Right, OpenSide.Left, OpenSide.Up],
+    openSides: ["Down", "Right", "Left", "Up"],
     deadEnd: false,
     uncovered: false,
   },
   {
-    type: CardType.End,
+    type: "End",
     gold: true,
-    openSides: [OpenSide.Down, OpenSide.Right, OpenSide.Left, OpenSide.Up],
+    openSides: ["Down", "Right", "Left", "Up"],
     deadEnd: false,
     uncovered: false,
   },

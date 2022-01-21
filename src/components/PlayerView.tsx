@@ -1,6 +1,6 @@
 import React from "react"
 import Grid from "@material-ui/core/Grid"
-import { Role, HandCard, CardType } from "../types/Cards"
+import {HandCard} from "../types/Cards"
 import Player from "../types/Player"
 import SaboteurCard from "./SaboteurCard"
 
@@ -24,7 +24,7 @@ const PlayerView: React.FC<RoleCardPickerProps> = ({ player, moves }) => (
     <hr />
     <Grid container spacing={5} justify="center">
       <Grid item key="roleCard">
-        <SaboteurCard card={{ type: CardType.Role, role: player.role || Role.Digger }} />
+        <SaboteurCard card={{ type: "Role", role: player.role || "Digger" }} />
       </Grid>
       {player.hand.map((card: HandCard, index: number) => (
         <Grid item key={index}>

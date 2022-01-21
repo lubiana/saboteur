@@ -8,16 +8,16 @@ interface MapTileCanvasProps {
 
 const drawForNormal = (ctx: CanvasRenderingContext2D, side: OpenSide): void => {
   switch (side) {
-    case OpenSide.Left:
+    case "Left":
       ctx.fillRect(0, 30, 25, 10)
       break
-    case OpenSide.Right:
+    case "Right":
       ctx.fillRect(25, 30, 25, 10)
       break
-    case OpenSide.Down:
+    case "Down":
       ctx.fillRect(20, 30, 10, 40)
       break
-    case OpenSide.Up:
+    case "Up":
       ctx.fillRect(20, 0, 10, 40)
       break
     default:
@@ -27,16 +27,16 @@ const drawForNormal = (ctx: CanvasRenderingContext2D, side: OpenSide): void => {
 
 const drawForDeadEnd = (ctx: CanvasRenderingContext2D, side: OpenSide): void => {
   switch (side) {
-    case OpenSide.Left:
+    case "Left":
       ctx.fillRect(0, 30, 10, 10)
       break
-    case OpenSide.Right:
+    case "Right":
       ctx.fillRect(40, 30, 10, 10)
       break
-    case OpenSide.Down:
+    case "Down":
       ctx.fillRect(20, 60, 10, 10)
       break
-    case OpenSide.Up:
+    case "Up":
       ctx.fillRect(20, 0, 10, 10)
       break
     default:

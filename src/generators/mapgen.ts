@@ -1,11 +1,11 @@
 import {Map, MapItem} from "../types/Map"
-import {CardType, EndTile, MapCard, OpenSide} from "../types/Cards"
+import {EndTile, MapCard} from "../types/Cards"
 
 const mapGen = (endTiles: [EndTile, EndTile, EndTile]): Map => {
   const items: MapItem[] = []
   const startTile: MapCard = {
-    type: CardType.Start,
-    openSides: [OpenSide.Left, OpenSide.Right, OpenSide.Down, OpenSide.Up],
+    type: "Start",
+    openSides: ["Left", "Right", "Down", "Up"],
     deadEnd: false,
   }
   items.push({
