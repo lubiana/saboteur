@@ -14,7 +14,7 @@ const Saboteur = {
           index: 0,
           gold: 0,
           hand: [],
-          blockers: [],
+          blockers: {},
           peekedSlot: [],
         },
         {
@@ -22,7 +22,7 @@ const Saboteur = {
           index: 1,
           gold: 0,
           hand: [],
-          blockers: [],
+          blockers: {},
           peekedSlot: [],
         },
         {
@@ -30,7 +30,7 @@ const Saboteur = {
           index: 2,
           gold: 0,
           hand: [],
-          blockers: [],
+          blockers: {},
           peekedSlot: [],
         },
       ],

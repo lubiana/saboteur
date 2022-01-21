@@ -4,19 +4,14 @@ import {selected} from "../../../utils/cardHelper";
 import {INVALID_MOVE} from "boardgame.io/core";
 import {discardCard} from "./index";
 import {isUnblockCard} from "../../../types/guards";
+import {Tool} from "../../../types/Cards";
 
-const unblockPlayer = (G: GameState, ctx: Ctx, playerId: number) => {
+const unblockPlayer = (G: GameState, ctx: Ctx, playerId: number, tool: Tool) => {
+  const player = G.players[playerId];
   const card = selected(G, ctx)
 
-  if (isUnblockCard(card)) {
-    const blockerIndex = G.players[playerId].blockers
-      .findIndex(b => card.tools.includes(b))
-
-    if (blockerIndex === -1) {
-      return INVALID_MOVE
-    }
-
-    G.players[playerId].blockers.splice(blockerIndex, 1)
+  if (isUnblockCard(card) && player.blockers[tool] && card.tools.includes(tool)) {
+    player.blockers[tool] = false
     discardCard(G, ctx)
   } else {
     return INVALID_MOVE

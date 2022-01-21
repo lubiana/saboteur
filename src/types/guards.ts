@@ -21,13 +21,13 @@ export const isActionCard = (card?: SabCard): card is ActionCard =>
   !!card && card.type === "Action"
 
 export const isToolActionCard = (card?: SabCard): card is ToolActionCard =>
-  isActionCard(card) && 'tools' in card
+  isBlockCard(card) || isUnblockCard(card)
 
 export const isBlockCard = (card?: SabCard): card is BlockCard =>
-  isToolActionCard(card) && card.action === "Block"
+  isActionCard(card) && card.action === "Block"
 
 export const isUnblockCard = (card?: SabCard): card is UnblockCard =>
-  isToolActionCard(card) && card.action === "Unblock"
+  isActionCard(card) && card.action === "Unblock"
 
 export const isMapActionCard = (card?: SabCard): card is MapActionCard =>
   isPeekCard(card) || isDestroyCard(card)

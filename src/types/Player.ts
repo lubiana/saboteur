@@ -7,7 +7,7 @@ export default interface Player {
   gold: number
   role?: Role
   hand: HandCard[]
-  blockers: Tool[]
+  blockers: Partial<Record<Tool, boolean>>
   selectedCard?: number
   peekedSlot: Slot[]
 }

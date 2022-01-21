@@ -7,8 +7,7 @@ import {
   OpenSide,
   PathTile,
   SabCard,
-  Tool,
-  ToolAction
+  Tool
 } from "../types/Cards"
 
 const repeat = <T extends SabCard>(amount: number, card: T): T[] => {
@@ -25,22 +24,25 @@ const pathCard = (amount: number, deadEnd: boolean, sides: OpenSide[]): PathTile
 const mapActionCard = (amount: number, action: MapAction): MapActionCard[] =>
   repeat(amount, {type: "Action", action})
 
-const toolActionCard = (amount: number, action: ToolAction, tools: Tool[] = []): ActionCard[] =>
-  repeat(amount, {type: "Action", action, tools})
+const unblockActionCard = (amount: number, tools: Tool[]): ActionCard[] =>
+  repeat(amount, {type: "Action", action: "Unblock", tools})
+
+const blockActionCard = (amount: number, tool: Tool): ActionCard[] =>
+  repeat(amount, {type: "Action", action: "Block", tool})
 
 const actionCards = (): ActionCard[] => {
   const actionCards: ActionCard[] = []
   actionCards.push(...mapActionCard(6, "Peek"))
   actionCards.push(...mapActionCard(3, "Destroy"))
-  actionCards.push(...toolActionCard(3, "Block", ["Cart"]))
-  actionCards.push(...toolActionCard(3, "Block", ["Lamp"]))
-  actionCards.push(...toolActionCard(3, "Block", ["Pickaxe"]))
-  actionCards.push(...toolActionCard(2, "Unblock", ["Cart"]))
-  actionCards.push(...toolActionCard(2, "Unblock", ["Lamp"]))
-  actionCards.push(...toolActionCard(2, "Unblock", ["Pickaxe"]))
-  actionCards.push(...toolActionCard(1, "Unblock", ["Cart", "Lamp"]))
-  actionCards.push(...toolActionCard(1, "Unblock", ["Cart", "Pickaxe"]))
-  actionCards.push(...toolActionCard(1, "Unblock", ["Lamp", "Pickaxe"]))
+  actionCards.push(...blockActionCard(3, "Cart"))
+  actionCards.push(...blockActionCard(3, "Lamp"))
+  actionCards.push(...blockActionCard(3, "Pickaxe"))
+  actionCards.push(...unblockActionCard(2, ["Cart"]))
+  actionCards.push(...unblockActionCard(2, ["Lamp"]))
+  actionCards.push(...unblockActionCard(2, ["Pickaxe"]))
+  actionCards.push(...unblockActionCard(1, ["Cart", "Lamp"]))
+  actionCards.push(...unblockActionCard(1, ["Cart", "Pickaxe"]))
+  actionCards.push(...unblockActionCard(1, ["Lamp", "Pickaxe"]))
   return actionCards
 }
 

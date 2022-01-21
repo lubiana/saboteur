@@ -18,7 +18,7 @@ const onEnd = (G: GameState, ctx: Ctx) => {
         }
         player.role = undefined
         player.hand = []
-        player.blockers = []
+        player.blockers = {}
         return player
     })
     if (ctx.random !== undefined) {

@@ -4,7 +4,8 @@ export type MapAction = "Peek" | "Destroy";
 export type MapTile = "Path" | "End" | "Start"
 export type Action = ToolAction | MapAction
 export type CardType = MapTile | "Action" | "Role";
-export type Tool = "Pickaxe" | "Cart" | "Lamp"
+export const tools = ["Pickaxe", "Cart", "Lamp"] as const
+export type Tool = typeof tools[number]
 export type Role = "Digger" | "Saboteur" | "?"
 export type OpenSide = "Up" | "Down" | "Left" | "Right"
 
@@ -34,14 +35,15 @@ type IActionCard<A extends Action> = GameCard<"Action"> & {
   readonly action: A
 }
 
-type IToolCard<A extends ToolAction> = IActionCard<A> & {
-  readonly tools: Tool[]
-}
-
 type IMapActionCard<A extends MapAction> = IActionCard<A>
 
-export type BlockCard = IToolCard<"Block">
-export type UnblockCard = IToolCard<"Unblock">
+export type BlockCard = IActionCard<"Block"> & {
+  tool: Tool
+}
+export type UnblockCard = IActionCard<"Unblock"> & {
+  tools: Tool[]
+}
+
 export type ToolActionCard = BlockCard | UnblockCard
 
 export type PeekCard = IMapActionCard<"Peek">

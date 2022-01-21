@@ -10,7 +10,10 @@ const placeCard = (G: GameState, ctx: Ctx, slot: Slot) => {
   const player = G.players[Number(ctx.currentPlayer)];
   const card = selected(G, ctx)
 
-  if (!player.blockers.length && isPathTile(card)) {
+  let isBlocked = Object.values(player.blockers)
+    .some(tool => tool)
+
+  if (!isBlocked && isPathTile(card)) {
     player.hand.splice(player.selectedCard!!, 1)
 
     player.selectedCard = undefined

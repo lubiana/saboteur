@@ -1,8 +1,8 @@
 import React from "react"
 import Paper from "@material-ui/core/Paper"
-import {Tool, SabCard} from "../types/Cards"
+import {SabCard, Tool} from "../types/Cards"
 import MapTileCanvas from "./MapTileCanvas"
-import {isToolActionCard, isMapCard, isRoleCard, isMapActionCard} from "../types/guards";
+import {isBlockCard, isMapActionCard, isMapCard, isRoleCard, isUnblockCard} from "../types/guards";
 
 interface SaboteurCardProps {
   card: SabCard
@@ -13,21 +13,24 @@ interface SaboteurCardProps {
 const cardDisplay = (card: SabCard) => {
   if (isMapCard(card)) {
     return <MapTileCanvas card={card}/>
-  } else if (isToolActionCard(card)) {
+  } else if (isBlockCard(card)) {
     return (
       <div>
-        <span>{card.action}</span>
-        <ul>
-          {card.tools.map((item: Tool, index: number) => (
-            <li key={index}>{item}</li>
-          ))}
-        </ul>
+        <strong>{card.action}</strong>
+        <div>{card.tool}</div>
+      </div>
+    )
+  } else if (isUnblockCard(card)) {
+    return (
+      <div>
+        <strong>{card.action}</strong>
+        {card.tools.map((item: Tool) => <div key={item}>{item}</div>)}
       </div>
     )
   } else if (isMapActionCard(card)) {
-    return <span>{card.action}</span>
+    return <strong>{card.action}</strong>
   } else if (isRoleCard(card)) {
-    return <span>{card.role}</span>
+    return <strong>{card.role}</strong>
   }
 }
 

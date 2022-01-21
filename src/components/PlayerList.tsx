@@ -9,7 +9,7 @@ import {createStyles, makeStyles, Theme} from "@material-ui/core/styles"
 import Divider from "@material-ui/core/Divider"
 import Player from "../types/Player"
 import GameState from "../types/GameState"
-import {Tool} from "../types/Cards"
+import {Tool, tools} from "../types/Cards"
 import {cardSelected} from "../utils/mapHelper"
 import {selected} from '../utils/cardHelper'
 import {isBlockCard, isToolActionCard, isUnblockCard} from "../types/guards";
@@ -44,31 +44,15 @@ const discardPileText = (amount: number): string => "Discardpile (" + amount + "
 const canClick = (G: GameState, ctx: Ctx): boolean =>
   isToolActionCard(selected(G, ctx))
 
-const playerText = (player: Player): string => {
-  let output: string = player.name
-  const items = [
-    {l: "P", b: "Pickaxe"},
-    {l: "C", b: "Cart"},
-    {l: "L", b: "Lamp"},
-  ]
-
-  items.forEach((item: any) => {
-    const amount: number = player.blockers.filter((blocker: Tool) => blocker === item.b).length
-    output = output.concat(` (${item.l}:${amount.toString()})`)
-  })
-
-  return output
-}
-
 const PlayerList: React.FC<PlayerListProps> = ({G, ctx, moves}) => {
   const classes = useStyles()
 
-  const playerClick = (G: GameState, ctx: Ctx, index: number) => {
+  const onToolClick = (index: number, tool: Tool) => {
     const card = selected(G, ctx)
     if (isBlockCard(card)) {
       moves.blockPlayer(index)
     } else if (isUnblockCard(card)) {
-      moves.unblockPlayer(index)
+      moves.unblockPlayer(index, tool)
     }
   }
 
@@ -86,34 +70,33 @@ const PlayerList: React.FC<PlayerListProps> = ({G, ctx, moves}) => {
           <ListItem key="drawpile">
             <ListItemText primary={drawPileText(G.drawPile.length)}/>
           </ListItem>
+          <Divider/>
           <ListItem
             key="discardpile"
             selected={cardSelected(G, ctx)}
-            onClick={
-              cardSelected(G, ctx)
-                ? () => {
-                  moves.discardCard(G, ctx)
-                }
-                : undefined
-            }
+            onClick={() => moves.discardCard(G, ctx)}
           >
             <ListItemText primary={discardPileText(G.discardPile.length)}/>
           </ListItem>
         </List>
         <List>
-          <Divider/>
           {G.players.map((player: Player, index: number) => (
-            <ListItem
-              key={index}
-              selected={index === Number(ctx.currentPlayer) || canClick(G, ctx)}
-              onClick={
-                canClick(G, ctx)
-                  ? () => playerClick(G, ctx, index)
-                  : undefined
-              }
-            >
-              <ListItemText primary={playerText(player)}/>
-            </ListItem>
+            <>
+              <ListItem
+                key={index}
+                selected={index === Number(ctx.currentPlayer) || canClick(G, ctx)}
+              >
+                <ListItemText primary={player.name}/>
+                {tools.map(tool =>
+                  <ListItemText
+                    primary={tool}
+                    secondary={!!player.blockers[tool] + ""}
+                    onClick={() => onToolClick(index, tool)}
+                  />
+                )}
+              </ListItem>
+              <Divider/>
+            </>
           ))}
         </List>
       </div>
