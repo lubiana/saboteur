@@ -1,8 +1,8 @@
 import React from "react"
-import Paper from "@material-ui/core/Paper"
 import {SabCard, Tool} from "../types/Cards"
 import MapTileCanvas from "./MapTileCanvas"
 import {isBlockCard, isMapActionCard, isMapCard, isRoleCard, isUnblockCard} from "../types/guards";
+import {Paper} from "@mui/material";
 
 interface SaboteurCardProps {
   card: SabCard
@@ -35,7 +35,7 @@ const cardDisplay = (card: SabCard) => {
 }
 
 const SaboteurCard: React.FC<SaboteurCardProps> = ({card, onClick, elevation}) => (
-  <Paper onClick={onClick} elevation={elevation ? elevation : 0}>
+  <Paper onClick={onClick} elevation={elevation ? elevation : 0} >
     <div style={{width: "50px", height: "70px"}}>{cardDisplay(card)}</div>
   </Paper>
 )

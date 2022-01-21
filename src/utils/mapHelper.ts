@@ -3,7 +3,7 @@ import GameState from '../types/GameState'
 import {Ctx} from "boardgame.io"
 import Player from "../types/Player"
 import {OpenSide} from '../types/Cards'
-import {selected} from './cardHelper'
+import {isBlocked, selected} from './cardHelper'
 import {isDestroyCard, isEndTile, isMapCard, isPathTile, isPeekCard} from "../types/guards";
 
 export interface MapBoundaries {
@@ -64,18 +64,13 @@ export const freeSlot = (slot: Slot, items: MapItem[]): boolean => {
 }
 
 export const canPlaceCard = (G: GameState, ctx: Ctx, slot: Slot): boolean => {
-  if (!cardSelected(G, ctx, true)) {
-    return false
-  }
-  if (!hasSibling(slot, G.map.items)) {
-    return false
-  }
-  if (!freeSlot(slot, G.map.items)) {
-    return false
-  }
-
   const card = selected(G, ctx)
-  if (!isPathTile(card)) {
+
+  if (isBlocked(G, ctx)
+    || !cardSelected(G, ctx, true)
+    || !hasSibling(slot, G.map.items)
+    || !freeSlot(slot, G.map.items)
+    || !isPathTile(card)) {
     return false
   }
 
@@ -141,10 +136,14 @@ export const pathToZero = (slot: Slot, sides: OpenSide[], map: MapItem[], prev: 
 
 const slotForSide = (slot: Slot, side: OpenSide): Slot => {
   switch (side) {
-    case "Up": return { x: slot.x, y: slot.y - 1 }
-    case "Down": return { x: slot.x, y: slot.y + 1 }
-    case "Left": return { x: slot.x - 1, y: slot.y }
-    case "Right": return { x: slot.x + 1, y: slot.y }
+    case "Up":
+      return {x: slot.x, y: slot.y - 1}
+    case "Down":
+      return {x: slot.x, y: slot.y + 1}
+    case "Left":
+      return {x: slot.x - 1, y: slot.y}
+    case "Right":
+      return {x: slot.x + 1, y: slot.y}
   }
 }
 

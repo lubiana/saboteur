@@ -1,15 +1,12 @@
 import React from "react"
 import { Ctx } from "boardgame.io"
-import { createStyles, Theme, makeStyles } from "@material-ui/core/styles"
-import AppBar from "@material-ui/core/AppBar"
-import CssBaseline from "@material-ui/core/CssBaseline"
-import Toolbar from "@material-ui/core/Toolbar"
-import Typography from "@material-ui/core/Typography"
 import RoleCardPicker from "./RoleCardPicker"
 import GameState from "../types/GameState"
 import PlayerList from "./PlayerList"
 import PlayerView from "./PlayerView"
 import MapView from "./MapView"
+import {AppBar, CssBaseline, Theme, Toolbar, Typography} from "@mui/material";
+import {createStyles, makeStyles} from "@mui/styles";
 
 const drawerWidth = 240
 
@@ -17,9 +14,6 @@ const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
       display: "flex",
-    },
-    appBar: {
-      zIndex: theme.zIndex.drawer + 1,
     },
     drawer: {
       width: drawerWidth,
@@ -50,7 +44,7 @@ const Board: React.FC<BoardProps> = ({ ctx, G, moves, playerID }) => {
   return (
     <div className={classes.root}>
       <CssBaseline />
-      <AppBar position="fixed" className={classes.appBar}>
+      <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
         <Toolbar>
           <Typography variant="h6" noWrap>
             Clipped drawer {playerID}

@@ -1,18 +1,23 @@
 import React from "react"
-import Drawer from "@material-ui/core/Drawer"
-import Toolbar from "@material-ui/core/Toolbar"
-import List from "@material-ui/core/List"
-import ListItem from "@material-ui/core/ListItem"
-import ListItemText from "@material-ui/core/ListItemText"
 import {Ctx} from "boardgame.io"
-import {createStyles, makeStyles, Theme} from "@material-ui/core/styles"
-import Divider from "@material-ui/core/Divider"
 import Player from "../types/Player"
 import GameState from "../types/GameState"
 import {Tool, tools} from "../types/Cards"
 import {cardSelected} from "../utils/mapHelper"
 import {selected} from '../utils/cardHelper'
 import {isBlockCard, isToolActionCard, isUnblockCard} from "../types/guards";
+import {
+  Avatar, Badge, Chip,
+  Divider,
+  Drawer,
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
+  Theme,
+  Toolbar
+} from "@mui/material";
+import {createStyles, makeStyles} from "@mui/styles";
 
 const drawerWidth = 240
 
@@ -50,7 +55,7 @@ const PlayerList: React.FC<PlayerListProps> = ({G, ctx, moves}) => {
   const onToolClick = (index: number, tool: Tool) => {
     const card = selected(G, ctx)
     if (isBlockCard(card)) {
-      moves.blockPlayer(index)
+      moves.blockPlayer(index, tool)
     } else if (isUnblockCard(card)) {
       moves.unblockPlayer(index, tool)
     }
@@ -80,18 +85,30 @@ const PlayerList: React.FC<PlayerListProps> = ({G, ctx, moves}) => {
           </ListItem>
         </List>
         <List>
-          {G.players.map((player: Player, index: number) => (
+          {G.players.map((player: Player) => (
             <>
               <ListItem
-                key={index}
-                selected={index === Number(ctx.currentPlayer) || canClick(G, ctx)}
+                key={player.index}
+                selected={canClick(G, ctx)}
               >
-                <ListItemText primary={player.name}/>
+                {player.index === Number(ctx.currentPlayer) ? (
+                  <ListItemAvatar>
+                    <Badge color="primary" overlap="circular" variant="dot">
+                      <Avatar>{player.name}</Avatar>
+                    </Badge>
+                  </ListItemAvatar>
+                ) : (
+                  <ListItemAvatar>
+                    <Avatar>{player.name}</Avatar>
+                  </ListItemAvatar>
+                )}
                 {tools.map(tool =>
-                  <ListItemText
-                    primary={tool}
-                    secondary={!!player.blockers[tool] + ""}
-                    onClick={() => onToolClick(index, tool)}
+                  <Chip
+                    key={tool}
+                    label={tool}
+                    variant={player.blockers[tool] ? "filled" : "outlined"}
+                    size="small"
+                    onClick={() => onToolClick(player.index, tool)}
                   />
                 )}
               </ListItem>

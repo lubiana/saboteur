@@ -4,12 +4,13 @@ import {selected} from "../../../utils/cardHelper";
 import {INVALID_MOVE} from "boardgame.io/core";
 import {discardCard} from "./index";
 import {isBlockCard} from "../../../types/guards";
+import {Tool} from "../../../types/Cards";
 
-const blockPlayer = (G: GameState, ctx: Ctx, playerId: number) => {
+const blockPlayer = (G: GameState, ctx: Ctx, playerId: number, tool: Tool) => {
   const player = G.players[playerId];
   const card = selected(G, ctx)
 
-  if (isBlockCard(card) && !player.blockers[card.tool]) {
+  if (isBlockCard(card) && card.tool === tool && !player.blockers[card.tool]) {
     player.blockers[card.tool] = true
     discardCard(G, ctx)
   } else {

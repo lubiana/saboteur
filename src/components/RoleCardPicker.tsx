@@ -1,7 +1,7 @@
 import React from "react"
-import Grid from "@material-ui/core/Grid"
 import {RoleCard} from "../types/Cards"
 import SaboteurCard from "./SaboteurCard"
+import {Grid} from "@mui/material";
 
 interface RoleCardPickerProps {
   roleCards: RoleCard[]
@@ -9,7 +9,7 @@ interface RoleCardPickerProps {
 }
 
 const RoleCardPicker: React.FC<RoleCardPickerProps> = ({ roleCards, moves }) => (
-  <Grid container spacing={5} justify="center">
+  <Grid container spacing={5} justifyContent="center">
     {roleCards.map((card: RoleCard, index: number) => (
       <Grid item key={index}>
         <SaboteurCard
