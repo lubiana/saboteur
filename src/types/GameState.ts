@@ -7,6 +7,6 @@ export default interface GameState {
   drawPile: HandCard[]
   discardPile: HandCard[]
   roleCards: RoleCard[]
-  selectedCard: number | null
+  selectedCard?: number
   map: Map
 }

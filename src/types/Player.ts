@@ -5,19 +5,9 @@ export default interface Player {
   name: string
   index: number
   gold: number
-  role: Role | null
+  role?: Role
   hand: HandCard[]
   blockers: Tool[]
   selectedCard?: number
   peekedSlot: Slot[]
-}
-
-export const player1: Player = {
-  name: "lubi",
-  index: 0,
-  gold: 0,
-  role: null,
-  hand: [],
-  blockers: [],
-  peekedSlot: [],
 }

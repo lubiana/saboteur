@@ -3,8 +3,8 @@ import GameState from '../types/GameState'
 import {Ctx} from "boardgame.io"
 import Player from "../types/Player"
 import {OpenSide} from '../types/Cards'
-import {getSelectedCard, selectedDestroy, selectedPeek, slotForSide} from './cardHelper'
-import {isEndTile, isMapCard, isPathTile} from "../types/guards";
+import {selected} from './cardHelper'
+import {isDestroyCard, isEndTile, isMapCard, isPathTile, isPeekCard} from "../types/guards";
 
 export interface MapBoundaries {
   minX: number
@@ -41,7 +41,7 @@ const getMapItem = (slot: Slot, map: MapItem[]): MapItem | undefined => {
 }
 
 const getSelectedCardSides = (G: GameState, ctx: Ctx): OpenSide[] => {
-  const card = getSelectedCard(G, ctx)
+  const card = selected(G, ctx)
   return isMapCard(card) ? card.openSides : []
 }
 
@@ -74,7 +74,7 @@ export const canPlaceCard = (G: GameState, ctx: Ctx, slot: Slot): boolean => {
     return false
   }
 
-  const card = getSelectedCard(G, ctx)
+  const card = selected(G, ctx)
   if (!isPathTile(card)) {
     return false
   }
@@ -137,6 +137,15 @@ export const pathToZero = (slot: Slot, sides: OpenSide[], map: MapItem[], prev: 
 
     return pathToZero(path.slot, path.mapItem.card.openSides, map, prev)
   })
+}
+
+const slotForSide = (slot: Slot, side: OpenSide): Slot => {
+  switch (side) {
+    case OpenSide.Up: return { x: slot.x, y: slot.y - 1 }
+    case OpenSide.Down: return { x: slot.x, y: slot.y + 1 }
+    case OpenSide.Left: return { x: slot.x - 1, y: slot.y }
+    case OpenSide.Right: return { x: slot.x + 1, y: slot.y }
+  }
 }
 
 interface CompareItem {
@@ -203,7 +212,7 @@ export const removeCardFromMap = (G: GameState, ctx: Ctx, slot: Slot) => {
 }
 
 export const canPeekCard = (G: GameState, ctx: Ctx, slot: Slot): boolean =>
-  selectedPeek(G, ctx) && isEndTile(getMapItem(slot, G.map.items)?.card)
+  isPeekCard(selected(G, ctx)) && isEndTile(getMapItem(slot, G.map.items)?.card)
 
 export const canDestroyCard = (G: GameState, ctx: Ctx, slot: Slot): boolean =>
-  selectedDestroy(G, ctx) && isPathTile(getMapItem(slot, G.map.items)?.card)
+  isDestroyCard(selected(G, ctx)) && isPathTile(getMapItem(slot, G.map.items)?.card)

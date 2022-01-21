@@ -4,14 +4,15 @@ import Toolbar from "@material-ui/core/Toolbar"
 import List from "@material-ui/core/List"
 import ListItem from "@material-ui/core/ListItem"
 import ListItemText from "@material-ui/core/ListItemText"
-import { Ctx } from "boardgame.io"
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
+import {Ctx} from "boardgame.io"
+import {createStyles, makeStyles, Theme} from "@material-ui/core/styles"
 import Divider from "@material-ui/core/Divider"
 import Player from "../types/Player"
 import GameState from "../types/GameState"
-import { Tool } from "../types/Cards"
-import { cardSelected } from "../utils/mapHelper"
-import { selectedBlock, selectedUnblock } from '../utils/cardHelper'
+import {Tool} from "../types/Cards"
+import {cardSelected} from "../utils/mapHelper"
+import {selected} from '../utils/cardHelper'
+import {isBlockCard, isToolActionCard, isUnblockCard} from "../types/guards";
 
 const drawerWidth = 240
 
@@ -40,17 +41,15 @@ const drawPileText = (amount: number): string => "Drawpile (" + amount + ")"
 
 const discardPileText = (amount: number): string => "Discardpile (" + amount + ")"
 
-const canClick = (G: GameState, ctx: Ctx, index: number): boolean => {
-  return selectedBlock(G, ctx) || selectedUnblock(G, ctx)
-}
-
+const canClick = (G: GameState, ctx: Ctx): boolean =>
+  isToolActionCard(selected(G, ctx))
 
 const playerText = (player: Player): string => {
   let output: string = player.name
   const items = [
-    { l: "P", b: Tool.Pickaxe },
-    { l: "C", b: Tool.Cart },
-    { l: "L", b: Tool.Lamp },
+    {l: "P", b: Tool.Pickaxe},
+    {l: "C", b: Tool.Cart},
+    {l: "L", b: Tool.Lamp},
   ]
 
   items.forEach((item: any) => {
@@ -61,17 +60,16 @@ const playerText = (player: Player): string => {
   return output
 }
 
-const PlayerList: React.FC<PlayerListProps> = ({ G, ctx, moves }) => {
+const PlayerList: React.FC<PlayerListProps> = ({G, ctx, moves}) => {
   const classes = useStyles()
-  const playerClick = (G: GameState, ctx: Ctx, index: number) => {
-    if (selectedBlock(G, ctx)) {
-      moves.blockPlayer(index)
-      return
-    }
-    if (selectedUnblock(G, ctx)) {
-      moves.unBlockPlayer(index)
-    }
 
+  const playerClick = (G: GameState, ctx: Ctx, index: number) => {
+    const card = selected(G, ctx)
+    if (isBlockCard(card)) {
+      moves.blockPlayer(index)
+    } else if (isUnblockCard(card)) {
+      moves.unblockPlayer(index)
+    }
   }
 
   return (
@@ -82,11 +80,11 @@ const PlayerList: React.FC<PlayerListProps> = ({ G, ctx, moves }) => {
         paper: classes.drawerPaper,
       }}
     >
-      <Toolbar />
+      <Toolbar/>
       <div className={classes.drawerContainer}>
         <List>
           <ListItem key="drawpile">
-            <ListItemText primary={drawPileText(G.drawPile.length)} />
+            <ListItemText primary={drawPileText(G.drawPile.length)}/>
           </ListItem>
           <ListItem
             key="discardpile"
@@ -99,22 +97,22 @@ const PlayerList: React.FC<PlayerListProps> = ({ G, ctx, moves }) => {
                 : undefined
             }
           >
-            <ListItemText primary={discardPileText(G.discardPile.length)} />
+            <ListItemText primary={discardPileText(G.discardPile.length)}/>
           </ListItem>
         </List>
         <List>
-          <Divider />
+          <Divider/>
           {G.players.map((player: Player, index: number) => (
             <ListItem
               key={index}
-              selected={index === Number(ctx.currentPlayer) || canClick(G, ctx, index)}
+              selected={index === Number(ctx.currentPlayer) || canClick(G, ctx)}
               onClick={
-                canClick(G, ctx, index)
-                  ? () => { playerClick(G, ctx, index) }
+                canClick(G, ctx)
+                  ? () => playerClick(G, ctx, index)
                   : undefined
               }
             >
-              <ListItemText primary={playerText(player)} />
+              <ListItemText primary={playerText(player)}/>
             </ListItem>
           ))}
         </List>

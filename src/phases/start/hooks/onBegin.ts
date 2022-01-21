@@ -7,7 +7,7 @@ const onBegin = (G: GameState, ctx: Ctx) => {
     G.drawPile = []
     G.discardPile = []
     G.roleCards = generateRoles(G.players.length)
-    G.players.map((player: Player) => (player.role = null))
+    G.players.map((player: Player) => (player.role = undefined))
     if (ctx.random !== undefined) {
         G.roleCards = ctx.random.Shuffle(G.roleCards)
     }

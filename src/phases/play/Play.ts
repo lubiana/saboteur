@@ -1,5 +1,5 @@
 import {pathToZero} from '../../utils/mapHelper'
-import {blockPlayer, destroyCard, discardCard, flipCard, peek, placeCard, selectCard, unBlockPlayer} from "./moves";
+import {blockPlayer, destroyCard, discardCard, flipCard, peek, placeCard, selectCard, unblockPlayer} from "./moves";
 import {endIf, onBegin, onEnd} from "./hooks";
 import GameState from "../../types/GameState";
 import {Ctx} from "boardgame.io";
@@ -29,7 +29,7 @@ const Play = {
     placeCard,
     flipCard,
     blockPlayer,
-    unBlockPlayer,
+    unblockPlayer: unblockPlayer,
     destroyCard,
     peek,
   },

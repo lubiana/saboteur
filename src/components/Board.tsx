@@ -47,7 +47,6 @@ interface BoardProps {
 
 const Board: React.FC<BoardProps> = ({ ctx, G, moves, playerID }) => {
   const classes = useStyles()
-
   return (
     <div className={classes.root}>
       <CssBaseline />

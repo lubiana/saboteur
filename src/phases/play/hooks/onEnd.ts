@@ -17,7 +17,7 @@ const onEnd = (G: GameState, ctx: Ctx) => {
         if (player.role === Role.Saboteur && !diggerWin && ctx.random !== undefined) {
             player.gold = player.gold + ctx.random.Die(4)
         }
-        player.role = null
+        player.role = undefined
         player.hand = []
         player.blockers = []
         return player
