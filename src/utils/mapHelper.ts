@@ -4,7 +4,7 @@ import {Ctx} from "boardgame.io"
 import Player from "../types/Player"
 import {CardType, OpenSide} from '../types/Cards'
 import {getSelectedCard, selectedDestroy, selectedPeek, slotForSide} from './cardHelper'
-import {isEndTile, isMapTile, isPathTile} from "../types/typeGuards";
+import {isEndTile, isMapTile, isPathTile} from "../types/guards";
 
 export interface MapBoundaries {
   minX: number
@@ -183,7 +183,7 @@ const getSiblingCards = (siblings: Slot[], mapItems: MapItem[]): MapItem[] => {
     if (matchedItem === undefined) {
       return
     }
-    if (matchedItem.card.type === CardType.End && hasSibling(matchedItem.slot, mapItems)) {
+    if (isEndTile(matchedItem.card) && hasSibling(matchedItem.slot, mapItems)) {
       return
     }
     returnItems.push(matchedItem)
@@ -193,11 +193,8 @@ const getSiblingCards = (siblings: Slot[], mapItems: MapItem[]): MapItem[] => {
 }
 
 export const goldDiscovered = (G: GameState): boolean => {
-  const goldCard: MapItem | undefined = G.map.items.find(v => v.card.type === CardType.End && 'gold' in v.card && v.card.gold === true)
-  if (goldCard === undefined) {
-    return false
-  }
-  return pathToZero(goldCard.slot, goldCard.card.openSides, G.map.items, [])
+  const gold = G.map.items.find(v => isEndTile(v.card) && v.card.gold)
+  return !!gold && pathToZero(gold.slot, gold.card.openSides, G.map.items, [])
 }
 
 export const removeCardFromMap = (G: GameState, ctx: Ctx, slot: Slot) => {

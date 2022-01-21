@@ -4,7 +4,7 @@ import {getSelectedCard} from "../../../utils/cardHelper";
 import {Action} from "../../../types/Cards";
 import {INVALID_MOVE} from "boardgame.io/core";
 import {discardCard} from "./index";
-import {isBlockCard} from "../../../types/typeGuards";
+import {isBlockCard} from "../../../types/guards";
 
 const blockPlayer = (G: GameState, ctx: Ctx, playerId: number) => {
     const selectedCard = getSelectedCard(G, ctx)

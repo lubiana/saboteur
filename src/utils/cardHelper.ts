@@ -3,7 +3,7 @@ import {Action, HandCard, OpenSide} from '../types/Cards'
 import GameState from '../types/GameState'
 import {Ctx} from 'boardgame.io'
 import Player from '../types/Player'
-import {isActionCard, isBlockCard} from "../types/typeGuards";
+import {isActionCard, isBlockCard} from "../types/guards";
 
 export const slotForSide = (slot: Slot, side: OpenSide): Slot => {
     switch (side) {

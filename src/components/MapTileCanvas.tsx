@@ -1,6 +1,6 @@
 import React, {useEffect, useRef} from "react"
 import {EndTile, MapTile, OpenSide} from "../types/Cards"
-import {isEndTile, isMapTile, isPathTile} from "../types/typeGuards";
+import {isEndTile, isMapTile, isPathTile} from "../types/guards";
 
 interface MapTileCanvasProps {
   card: MapTile

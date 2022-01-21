@@ -2,7 +2,7 @@ import React from "react"
 import Paper from "@material-ui/core/Paper"
 import {BlockItem, SabCard} from "../types/Cards"
 import MapTileCanvas from "./MapTileCanvas"
-import {isActionCard, isBlockCard, isMapTile, isRoleCard} from "../types/typeGuards";
+import {isActionCard, isBlockCard, isMapTile, isRoleCard} from "../types/guards";
 
 interface SaboteurCardProps {
   card: SabCard

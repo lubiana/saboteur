@@ -2,7 +2,7 @@ import GameState from "../../../types/GameState";
 import {Ctx} from "boardgame.io";
 import {INVALID_MOVE} from "boardgame.io/core";
 import {flipSide, getSelectedCard} from "../../../utils/cardHelper";
-import {isPathTile} from "../../../types/typeGuards";
+import {isPathTile} from "../../../types/guards";
 
 const flipCard = (G: GameState, ctx: Ctx) => {
     const card = getSelectedCard(G, ctx)
