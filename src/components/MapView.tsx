@@ -53,29 +53,24 @@ const getCurrentPlayersUncoveredSlots = (G: GameState, ctx: Ctx): Slot[] => {
   return currentPlayer.peekedSlot
 }
 
-const canClick = (G: GameState, ctx: Ctx, slot: Slot): boolean =>
-  canPlaceCard(G, ctx, slot) ||
-  canDestroyCard(G, ctx, slot) ||
-  canPeekCard(G, ctx, slot)
-
-const click = (G: GameState, ctx: Ctx, moves: any, slot: Slot) => {
-  if (canPlaceCard(G, ctx, slot)) {
-    moves.placeCard(slot)
-    return
-  }
-  if (canDestroyCard(G, ctx, slot)) {
-    moves.destroyCard(slot)
-    return
-  }
-  if (canPeekCard(G, ctx, slot)) {
-    moves.peek(slot)
-    return
-  }
-  return
-}
-
 const MapView: React.FC<MapViewProps> = ({G, ctx, moves}) => {
   const playerPeeked = getCurrentPlayersUncoveredSlots(G, ctx)
+
+  const canClick = (slot: Slot): boolean =>
+    canPlaceCard(G, ctx, slot) ||
+    canDestroyCard(G, ctx, slot) ||
+    canPeekCard(G, ctx, slot)
+
+  const onClick = (slot: Slot) => {
+    if (canPlaceCard(G, ctx, slot)) {
+      moves.placeCard(slot)
+    } else if (canDestroyCard(G, ctx, slot)) {
+      moves.destroyCard(slot)
+    } else if (canPeekCard(G, ctx, slot)) {
+      moves.peek(slot)
+    }
+  }
+
   return (
     <div>
       <table>
@@ -86,12 +81,8 @@ const MapView: React.FC<MapViewProps> = ({G, ctx, moves}) => {
               <td key={xIndex}>
                 <SaboteurCard
                   card={getCardForSlot(x, y, G.map, playerPeeked)}
-                  elevation={canClick(G, ctx, {x: x, y: y}) ? 5 : 0}
-                  onClick={
-                    canClick(G, ctx, {x: x, y: y})
-                      ? () => click(G, ctx, moves, {x: x, y: y})
-                      : undefined
-                  }
+                  elevation={canClick({x: x, y: y}) ? 5 : 0}
+                  onClick={() => onClick({x: x, y: y})}
                 />
               </td>
             ))}
