@@ -1,18 +1,19 @@
-import { Map, MapItem, Slot } from '../types/Map'
+import {Map, MapItem, Slot} from '../types/Map'
 import GameState from '../types/GameState'
-import { Ctx } from "boardgame.io"
+import {Ctx} from "boardgame.io"
 import Player from "../types/Player"
-import { CardType, OpenSide, HandCard, PathTile, Action } from '../types/Cards'
-import { slotForSide, getSelectedCard } from './cardHelper'
+import {CardType, OpenSide} from '../types/Cards'
+import {getSelectedCard, selectedDestroy, selectedPeek, slotForSide} from './cardHelper'
+import {isEndTile, isMapTile, isPathTile} from "../types/typeGuards";
 
-export interface mapBoundaries {
+export interface MapBoundaries {
   minX: number
   maxX: number
   minY: number
   maxY: number
 }
 
-const getBoundaries = (map: Map): mapBoundaries => ({
+export const getBoundaries = (map: Map): MapBoundaries => ({
   minX: map.items.reduce((p: MapItem, c: MapItem) => (p.slot.x <= c.slot.x ? p : c)).slot.x,
   maxX: map.items.reduce((p: MapItem, c: MapItem) => (p.slot.x <= c.slot.x ? c : p)).slot.x,
   minY: map.items.reduce((p: MapItem, c: MapItem) => (p.slot.y <= c.slot.y ? p : c)).slot.y,
@@ -39,39 +40,18 @@ const getMapItem = (slot: Slot, map: MapItem[]): MapItem | undefined => {
   return map[index]
 }
 
-const getSelectedPathTile = (G: GameState, ctx: Ctx): PathTile | undefined => {
-  const card = getSelectedCard(G, ctx)
-  if (card === undefined) {
-    return card
-  }
-  if ("openSides" in card) {
-    return card
-  }
-
-  return undefined
-}
-
 const getSelectedCardSides = (G: GameState, ctx: Ctx): OpenSide[] => {
-  const player: Player = G.players[Number(ctx.currentPlayer)]
-  if (player.selectedCard === undefined) {
-    return []
-  }
-
-  const card: HandCard = player.hand[player.selectedCard]
-  if ("openSides" in card) {
-    return card.openSides
-  }
-
-  return []
+  const card = getSelectedCard(G, ctx)
+  return isMapTile(card) ? card.openSides : []
 }
 
 const getSiblings = (slot: Slot): [Slot, Slot, Slot, Slot] => {
   const {x, y} = slot
   return [
-    { x: x, y: y - 1 },
-    { x: x, y: y + 1 },
-    { x: x - 1, y: y },
-    { x: x + 1, y: y },
+    {x: x, y: y - 1},
+    {x: x, y: y + 1},
+    {x: x - 1, y: y},
+    {x: x + 1, y: y},
   ]
 }
 
@@ -94,20 +74,15 @@ export const canPlaceCard = (G: GameState, ctx: Ctx, slot: Slot): boolean => {
     return false
   }
 
-  const selectedCard = getSelectedPathTile(G, ctx)
-  if (selectedCard === undefined) {
+  const card = getSelectedCard(G, ctx)
+  if (!isPathTile(card)) {
     return false
-  }
-
-  const cardToPlace: MapItem = {
-    slot: slot,
-    card: selectedCard,
   }
 
   const siblingCards = getSiblingCards(getSiblings(slot), G.map.items)
 
   const validSibling = (sibling: MapItem): boolean => {
-    if ('uncovered' in sibling.card && !sibling.card.uncovered) {
+    if (isEndTile(sibling.card) && !sibling.card.uncovered) {
       return true
     }
     return sibling.card.deadEnd
@@ -117,21 +92,18 @@ export const canPlaceCard = (G: GameState, ctx: Ctx, slot: Slot): boolean => {
     return false
   }
 
-  if (!pathToZero(slot, selectedCard.openSides, G.map.items, [])) {
+  if (!pathToZero(slot, card.openSides, G.map.items, [])) {
     return false
   }
 
-  return siblingCards.every((item) => {
-    const place: compareItem = {
-      sides: cardToPlace.card.openSides,
-      slot: cardToPlace.slot,
-    }
-    const sibling: compareItem = {
-      sides: item.card.openSides,
-      slot: item.slot,
-    }
-    return cardCompatibility(place, sibling, true)
-  })
+  const place: CompareItem = {
+    slot: slot,
+    sides: card.openSides,
+  }
+
+  return siblingCards
+    .map(mapItemToCompareItem)
+    .every((sibling) => compatible(place, sibling, true))
 }
 
 export const pathToZero = (slot: Slot, sides: OpenSide[], map: MapItem[], prev: Slot[] = []): boolean => {
@@ -152,18 +124,14 @@ export const pathToZero = (slot: Slot, sides: OpenSide[], map: MapItem[], prev: 
         mapItem: getMapItem(resolvedSlot, map),
       }
     })
-    .filter((value) => {
-      return value.mapItem !== undefined && !value.mapItem.card.deadEnd
-    })
+    .filter((value) => value.mapItem && !value.mapItem.card.deadEnd)
 
   return paths.some((path) => {
     if (path.mapItem === undefined) {
       return false
     }
 
-    const compat = cardCompatibility({ slot: slot, sides: sides }, mapItemToCompareItem(path.mapItem), false)
-
-    if (!compat) {
+    if (!compatible({slot: slot, sides: sides}, mapItemToCompareItem(path.mapItem), false)) {
       return false
     }
 
@@ -171,16 +139,16 @@ export const pathToZero = (slot: Slot, sides: OpenSide[], map: MapItem[], prev: 
   })
 }
 
-interface compareItem {
+interface CompareItem {
   slot: Slot
   sides: OpenSide[]
 }
 
-const mapItemToCompareItem = (item: MapItem): compareItem => {
-  return { slot: item.slot, sides: item.card.openSides }
+const mapItemToCompareItem = (item: MapItem): CompareItem => {
+  return {slot: item.slot, sides: item.card.openSides}
 }
 
-const cardCompatibility = (a: compareItem, b: compareItem, noneAllowed: boolean = true): boolean => {
+const compatible = (a: CompareItem, b: CompareItem, noneAllowed: boolean = true): boolean => {
   if (a.slot.x === b.slot.x) {
     if (a.slot.y > b.slot.y) {
       return checkSides(b.sides, a.sides, OpenSide.Down, OpenSide.Up, noneAllowed)
@@ -232,49 +200,13 @@ export const goldDiscovered = (G: GameState): boolean => {
   return pathToZero(goldCard.slot, goldCard.card.openSides, G.map.items, [])
 }
 
-export const removeCardFromMap = (G: GameState, ctx: Ctx, slot: Slot): GameState => {
+export const removeCardFromMap = (G: GameState, ctx: Ctx, slot: Slot) => {
   const cardIndex = getMapItemIndex(slot, G.map.items)
   G.map.items.splice(cardIndex, 1)
-  return G
 }
 
-export const canPeekCard = (G: GameState, ctx: Ctx, slot: Slot): boolean => {
-  const selectedCard = getSelectedCard(G, ctx)
-  if (selectedCard === undefined) {
-    return false
-  }
-  if (selectedCard.type !== CardType.Action) {
-    return false
-  }
-  if (selectedCard.action !== Action.Peek) {
-    return false
-  }
-  const mapCard = getMapItem(slot, G.map.items)
-  if (mapCard === undefined) {
-    return false
-  }
+export const canPeekCard = (G: GameState, ctx: Ctx, slot: Slot): boolean =>
+  selectedPeek(G, ctx) && isEndTile(getMapItem(slot, G.map.items)?.card)
 
-  return mapCard.card.type === CardType.End;
-}
-
-export const canDestroyCard = (G: GameState, ctx: Ctx, slot: Slot): boolean => {
-  const selectedCard = getSelectedCard(G, ctx)
-  if (selectedCard === undefined) {
-    return false
-  }
-  if (selectedCard.type !== CardType.Action) {
-    return false
-  }
-  if (selectedCard.action !== Action.Destroy) {
-    return false
-  }
-
-  const mapCard = getMapItem(slot, G.map.items)
-  if (mapCard === undefined) {
-    return false
-  }
-
-  return mapCard.card.type === CardType.Path;
-}
-
-export default getBoundaries
+export const canDestroyCard = (G: GameState, ctx: Ctx, slot: Slot): boolean =>
+  selectedDestroy(G, ctx) && isPathTile(getMapItem(slot, G.map.items)?.card)

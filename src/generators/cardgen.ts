@@ -1,5 +1,4 @@
-import { MapTile } from "../types/Cards"
-import { CardType, PathTile, OpenSide, Action, ActionCard, BlockItem, HandCard, EndTile } from "../types/Cards"
+import {Action, ActionCard, BlockCard, BlockItem, CardType, EndTile, HandCard, OpenSide, PathTile} from "../types/Cards"
 
 const pathTileGenerator = (amount: number, deadEnd: boolean, sides: OpenSide[]): PathTile[] => {
   const pathTiles: PathTile[] = []
@@ -13,18 +12,27 @@ const pathTileGenerator = (amount: number, deadEnd: boolean, sides: OpenSide[]):
   return pathTiles
 }
 
-const actionCardGenerator = (amount: number, action: Action, blockItems: BlockItem[] = []): ActionCard[] => {
+const actionCardGenerator = (amount: number, action: Action): ActionCard[] => {
   const cards: ActionCard[] = []
 
   for (let index = 0; index < amount; index++) {
-    const card: ActionCard = {
+    cards.push({
       type: CardType.Action,
       action,
-    }
-    if (blockItems.length > 0) {
-      card.blockItems = blockItems
-    }
-    cards.push(card)
+    })
+  }
+  return cards
+}
+
+const blockCardGenerator = (amount: number, action: Action, blockItems: BlockItem[] = []): ActionCard[] => {
+  const cards: BlockCard[] = []
+
+  for (let index = 0; index < amount; index++) {
+    cards.push({
+      type: CardType.Action,
+      action,
+      blockItems
+    })
   }
   return cards
 }
@@ -33,15 +41,16 @@ const actionCards = (): ActionCard[] => {
   const actionCards: ActionCard[] = []
   actionCards.push(...actionCardGenerator(6, Action.Peek))
   actionCards.push(...actionCardGenerator(3, Action.Destroy))
-  actionCards.push(...actionCardGenerator(3, Action.Block, [BlockItem.Cart]))
-  actionCards.push(...actionCardGenerator(3, Action.Block, [BlockItem.Lamp]))
-  actionCards.push(...actionCardGenerator(3, Action.Block, [BlockItem.Pickaxe]))
-  actionCards.push(...actionCardGenerator(2, Action.Unblock, [BlockItem.Cart]))
-  actionCards.push(...actionCardGenerator(2, Action.Unblock, [BlockItem.Lamp]))
-  actionCards.push(...actionCardGenerator(2, Action.Unblock, [BlockItem.Pickaxe]))
-  actionCards.push(...actionCardGenerator(1, Action.Unblock, [BlockItem.Cart, BlockItem.Lamp]))
-  actionCards.push(...actionCardGenerator(1, Action.Unblock, [BlockItem.Cart, BlockItem.Pickaxe]))
-  actionCards.push(...actionCardGenerator(1, Action.Unblock, [BlockItem.Lamp, BlockItem.Pickaxe]))
+  // block/unblock
+  actionCards.push(...blockCardGenerator(3, Action.Block, [BlockItem.Cart]))
+  actionCards.push(...blockCardGenerator(3, Action.Block, [BlockItem.Lamp]))
+  actionCards.push(...blockCardGenerator(3, Action.Block, [BlockItem.Pickaxe]))
+  actionCards.push(...blockCardGenerator(2, Action.Unblock, [BlockItem.Cart]))
+  actionCards.push(...blockCardGenerator(2, Action.Unblock, [BlockItem.Lamp]))
+  actionCards.push(...blockCardGenerator(2, Action.Unblock, [BlockItem.Pickaxe]))
+  actionCards.push(...blockCardGenerator(1, Action.Unblock, [BlockItem.Cart, BlockItem.Lamp]))
+  actionCards.push(...blockCardGenerator(1, Action.Unblock, [BlockItem.Cart, BlockItem.Pickaxe]))
+  actionCards.push(...blockCardGenerator(1, Action.Unblock, [BlockItem.Lamp, BlockItem.Pickaxe]))
   return actionCards
 }
 
@@ -74,7 +83,7 @@ export const generateCards = (): HandCard[] => {
   return cards
 }
 
-export const emptyCard = (): MapTile => {
+export const emptyCard = (): PathTile => {
   return {
     type: CardType.Path,
     openSides: [],

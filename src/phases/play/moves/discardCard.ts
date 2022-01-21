@@ -10,10 +10,12 @@ const discardCard = (G: GameState, ctx: Ctx) => {
     if (selectedCard === undefined) {
         return INVALID_MOVE
     }
+
     const card: HandCard[] = G.players[currentPlayer].hand.splice(selectedCard, 1)
     G.players[currentPlayer].selectedCard = undefined
     G.discardPile.push(...card)
     const playerCard = G.drawPile.pop()
+
     if (playerCard !== undefined) {
         G.players[currentPlayer].hand.push(playerCard)
     }

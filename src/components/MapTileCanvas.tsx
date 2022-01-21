@@ -1,8 +1,9 @@
-import React, { useEffect, useRef } from "react"
-import { CardType, MapTile, OpenSide, EndTile } from "../types/Cards"
+import React, {useEffect, useRef} from "react"
+import {EndTile, MapTile, OpenSide} from "../types/Cards"
+import {isEndTile, isMapTile, isPathTile} from "../types/typeGuards";
 
 interface MapTileCanvasProps {
-  card: MapTile | EndTile
+  card: MapTile
 }
 
 const drawForNormal = (ctx: CanvasRenderingContext2D, side: OpenSide): void => {
@@ -45,42 +46,53 @@ const drawForDeadEnd = (ctx: CanvasRenderingContext2D, side: OpenSide): void => 
 
 const drawEndCard = (ctx: CanvasRenderingContext2D, card: EndTile) => {
   ctx.fillStyle = "#000"
+
   if (!card.uncovered) {
     ctx.strokeRect(20, 30, 10, 10)
     return
   }
+
   ctx.fillStyle = card.gold ? "#f90" : "#000"
   ctx.fillRect(20, 30, 10, 10)
 }
 
-const MapTileCanvas: React.FC<MapTileCanvasProps> = ({ card }) => {
+function drawMapTile(card: MapTile, context: CanvasRenderingContext2D) {
+  card.openSides.forEach((side: OpenSide) => {
+    if (card.deadEnd) {
+      drawForDeadEnd(context, side)
+    } else {
+      drawForNormal(context, side)
+    }
+  })
+}
+
+const MapTileCanvas: React.FC<MapTileCanvasProps> = ({card}) => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
     if (!canvasRef.current) {
       return
     }
+
     const canvas = canvasRef.current
     const context = canvas.getContext("2d")
     if (!context) {
       return
     }
+
     context.clearRect(0, 0, context.canvas.width, context.canvas.height)
-    context.fillStyle = card.type === CardType.Path ? "#000" : "#060"
-    if ("openSides" in card && card.type !== CardType.End) {
-      card.openSides.forEach((side: OpenSide) => {
-        if (card.deadEnd === true) {
-          drawForDeadEnd(context, side)
-        } else {
-          drawForNormal(context, side)
-        }
-      })
-    }
-    if (card.type === CardType.End && "gold" in card && "uncovered" in card) {
-      drawEndCard(context, card)
+    context.fillStyle = isPathTile(card) ? "#000" : "#060"
+
+    if (isMapTile(card)) {
+      if (isEndTile(card)) {
+        drawEndCard(context, card)
+      } else {
+        drawMapTile(card, context);
+      }
     }
   })
-  return <canvas width="50" height="70" style={{ width: "50px", height: "70px" }} ref={canvasRef} />
+
+  return <canvas width="50" height="70" style={{width: "50px", height: "70px"}} ref={canvasRef}/>
 }
 
 export default MapTileCanvas

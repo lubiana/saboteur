@@ -44,8 +44,13 @@ export interface RoleCard extends GameCard {
   role: Role
 }
 
+export const mapTileTypes: readonly CardType[] =
+    [CardType.Path, CardType.End, CardType.Start] as const
+
+type MapTileType = typeof mapTileTypes[number];
+
 export interface MapTile extends GameCard {
-  type: CardType.Path | CardType.End | CardType.Start
+  type: MapTileType
   openSides: OpenSide[]
   deadEnd: boolean
 }
@@ -63,8 +68,12 @@ export interface EndTile extends MapTile {
 export interface ActionCard {
   type: CardType.Action
   action: Action
-  blockItems?: BlockItem[]
 }
+
+export interface BlockCard extends ActionCard {
+  blockItems: BlockItem[]
+}
+
 export type HandCard = ActionCard | PathTile
 export type SabCard = HandCard | RoleCard | MapTile
 export type MapCard = PathTile | EndTile | MapTile

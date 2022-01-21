@@ -1,7 +1,8 @@
 import React from "react"
 import Paper from "@material-ui/core/Paper"
-import { CardType, SabCard, BlockItem } from "../types/Cards"
+import {BlockItem, SabCard} from "../types/Cards"
 import MapTileCanvas from "./MapTileCanvas"
+import {isActionCard, isBlockCard, isMapTile, isRoleCard} from "../types/typeGuards";
 
 interface SaboteurCardProps {
   card: SabCard
@@ -10,32 +11,33 @@ interface SaboteurCardProps {
 }
 
 const cardDisplay = (card: SabCard) => {
-  if (card.type === CardType.Path || card.type === CardType.End || card.type === CardType.Start) {
-    return <MapTileCanvas card={card} />
+  if (isMapTile(card)) {
+    return <MapTileCanvas card={card}/>
   }
-  if (card.type === CardType.Action && card.blockItems === undefined) {
-    return <span>{card.action}</span>
+  if (isActionCard(card)) {
+    if (isBlockCard(card)) {
+      return (
+        <div>
+          <span>{card.action}</span>
+          <ul>
+            {card.blockItems.map((item: BlockItem, index: number) => (
+              <li key={index}>{item}</li>
+            ))}
+          </ul>
+        </div>
+      )
+    } else {
+      return <span>{card.action}</span>
+    }
   }
-  if (card.type === CardType.Action && card.blockItems !== undefined) {
-    return (
-      <div>
-        <span>{card.action}</span>
-        <ul>
-          {card.blockItems.map((item: BlockItem, index: number) => (
-            <li key={index}>{item}</li>
-          ))}
-        </ul>
-      </div>
-    )
-  }
-  if (card.type === CardType.Role) {
+  if (isRoleCard(card)) {
     return <span>{card.role}</span>
   }
 }
 
-const SaboteurCard: React.FC<SaboteurCardProps> = ({ card, onClick, elevation }) => (
+const SaboteurCard: React.FC<SaboteurCardProps> = ({card, onClick, elevation}) => (
   <Paper onClick={onClick} elevation={elevation ? elevation : 0}>
-    <div style={{ width: "50px", height: "70px" }}>{cardDisplay(card)}</div>
+    <div style={{width: "50px", height: "70px"}}>{cardDisplay(card)}</div>
   </Paper>
 )
 
