@@ -1,6 +1,6 @@
 import React from "react"
-import { Map, MapItem, Coordinate } from '../types/Map'
-import getBoundaries, { mapBounddaries } from "../utils/mapHelper"
+import { Map, MapItem, Slot } from '../types/Map'
+import getBoundaries, { mapBoundaries } from "../utils/mapHelper"
 import { SabCard } from "../types/Cards"
 import { emptyCard } from "../generators/cardgen"
 import SaboteurCard from "./SaboteurCard"
@@ -15,7 +15,7 @@ interface MapViewProps {
 }
 
 const getColumns = (map: Map): number[] => {
-  const boundaries: mapBounddaries = getBoundaries(map)
+  const boundaries: mapBoundaries = getBoundaries(map)
   const columns: number[] = []
   for (let i: number = boundaries.minX - 1; i < boundaries.maxX + 2; i++) {
     columns.push(i)
@@ -24,7 +24,7 @@ const getColumns = (map: Map): number[] => {
 }
 
 const getRows = (map: Map): number[] => {
-  const boundaries: mapBounddaries = getBoundaries(map)
+  const boundaries: mapBoundaries = getBoundaries(map)
   const rows: number[] = []
   for (let i: number = boundaries.minY - 1; i < boundaries.maxY + 2; i++) {
     rows.push(i)
@@ -32,13 +32,13 @@ const getRows = (map: Map): number[] => {
   return rows
 }
 
-const getCardForCoord = (x: number, y: number, map: Map, peekedCoords: Coordinate[] = []): SabCard => {
+const getCardForSlot = (x: number, y: number, map: Map, peekedslots: Slot[] = []): SabCard => {
   const card: MapItem | undefined = map.items.find((item: MapItem) => {
-    return item.coords.x === x && item.coords.y === y
+    return item.slot.x === x && item.slot.y === y
   })
   if (card !== undefined) {
     const clone = { ...card.card }
-    if (peekedCoords.some(v => v.x === x && v.y === y) && 'uncovered' in clone) {
+    if (peekedslots.some(v => v.x === x && v.y === y) && 'uncovered' in clone) {
       clone.uncovered = true
     }
     return clone
@@ -46,36 +46,36 @@ const getCardForCoord = (x: number, y: number, map: Map, peekedCoords: Coordinat
   return emptyCard()
 }
 
-const getCurrentPlayersUncoveredCoords = (G: GameState, ctx: Ctx): Coordinate[] => {
+const getCurrentPlayersUncoveredSlots = (G: GameState, ctx: Ctx): Slot[] => {
   const currentPlayer = G.players[Number(ctx.currentPlayer)]
   if (currentPlayer === undefined) {
     return []
   }
-  return currentPlayer.peekedCoords
+  return currentPlayer.peekedSlot
 }
 
-const canClick = (G: GameState, ctx: Ctx, coord: Coordinate): boolean => {
-  return canPlaceCard(G, ctx, coord.x, coord.y) || canDestroyCard(G, ctx, coord) || canPeekCard(G, ctx, coord)
+const canClick = (G: GameState, ctx: Ctx, slot: Slot): boolean => {
+  return canPlaceCard(G, ctx, slot) || canDestroyCard(G, ctx, slot) || canPeekCard(G, ctx, slot)
 }
 
-const click = (G: GameState, ctx: Ctx, moves: any, coord: Coordinate) => {
-  if (canPlaceCard(G, ctx, coord.x, coord.y)) {
-    moves.placeCard(coord.x, coord.y)
+const click = (G: GameState, ctx: Ctx, moves: any, slot: Slot) => {
+  if (canPlaceCard(G, ctx, slot)) {
+    moves.placeCard(slot)
     return
   }
-  if (canDestroyCard(G, ctx, coord)) {
-    moves.destroyCard(coord)
+  if (canDestroyCard(G, ctx, slot)) {
+    moves.destroyCard(slot)
     return
   }
-  if (canPeekCard(G, ctx, coord)) {
-    moves.peek(coord)
+  if (canPeekCard(G, ctx, slot)) {
+    moves.peek(slot)
     return
   }
   return
 }
 
 const MapView: React.FC<MapViewProps> = ({ G, ctx, moves }) => {
-  const playerPeeked = getCurrentPlayersUncoveredCoords(G, ctx)
+  const playerPeeked = getCurrentPlayersUncoveredSlots(G, ctx)
   return (
     <div>
       <table>
@@ -85,7 +85,7 @@ const MapView: React.FC<MapViewProps> = ({ G, ctx, moves }) => {
               {getColumns(G.map).map((x: number, xIndex: number) => (
                 <td key={xIndex}>
                   <SaboteurCard
-                    card={getCardForCoord(x, y, G.map, playerPeeked)}
+                    card={getCardForSlot(x, y, G.map, playerPeeked)}
                     elevation={canClick(G, ctx, { x: x, y: y }) ? 5 : 0}
                     onClick={
                       canClick(G, ctx, { x: x, y: y })

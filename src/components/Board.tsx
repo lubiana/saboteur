@@ -37,12 +37,14 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 )
+
 interface BoardProps {
   G: GameState
   ctx: Ctx
   moves: any
   playerID: any
 }
+
 const Board: React.FC<BoardProps> = ({ ctx, G, moves, playerID }) => {
   const classes = useStyles()
 

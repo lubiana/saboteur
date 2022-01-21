@@ -5,11 +5,11 @@ export interface Map {
 }
 export type MapRow = MapCard[]
 export interface MapItem {
-  coords: Coordinate
+  slot: Slot
   card: MapCard
 }
 
-export interface Coordinate {
+export interface Slot {
   x: number
   y: number
 }

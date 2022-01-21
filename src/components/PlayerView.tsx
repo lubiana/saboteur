@@ -26,7 +26,7 @@ const PlayerView: React.FC<RoleCardPickerProps> = ({ player, moves }) => (
       <Grid item key="roleCard">
         <SaboteurCard card={{ type: CardType.Role, role: player.role || Role.Digger }} />
       </Grid>
-      {player.cards.map((card: HandCard, index: number) => (
+      {player.hand.map((card: HandCard, index: number) => (
         <Grid item key={index}>
           <SaboteurCard card={card} onClick={() => moves.selectCard(index)} elevation={elevation(player, index)} />
         </Grid>

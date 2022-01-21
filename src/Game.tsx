@@ -1,6 +1,6 @@
-import Start from "./phases/Start"
+import Start from "./phases/start/Start"
 import GameState from "./types/GameState"
-import Play from "./phases/Play"
+import Play from "./phases/play/Play"
 
 const Saboteur = {
   name: "Saboteur",
@@ -14,27 +14,27 @@ const Saboteur = {
           index: 0,
           gold: 0,
           role: null,
-          cards: [],
+          hand: [],
           blockers: [],
-          peekedCoords: [],
+          peekedSlot: [],
         },
         {
           name: "du",
           index: 1,
           gold: 0,
           role: null,
-          cards: [],
+          hand: [],
           blockers: [],
-          peekedCoords: [],
+          peekedSlot: [],
         },
         {
           name: "ich",
           index: 2,
           gold: 0,
           role: null,
-          cards: [],
+          hand: [],
           blockers: [],
-          peekedCoords: [],
+          peekedSlot: [],
         },
       ],
       drawPile: [],

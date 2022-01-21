@@ -1,22 +1,22 @@
-import { Map, MapItem, Coordinate } from '../types/Map'
+import { Map, MapItem, Slot } from '../types/Map'
 import GameState from '../types/GameState'
 import { Ctx } from "boardgame.io"
 import Player from "../types/Player"
 import { CardType, OpenSide, HandCard, PathTile, Action } from '../types/Cards'
-import { coordForSide, getSelectedCard } from './cardHelper'
+import { slotForSide, getSelectedCard } from './cardHelper'
 
-export interface mapBounddaries {
+export interface mapBoundaries {
   minX: number
   maxX: number
   minY: number
   maxY: number
 }
 
-const getBoundaries = (map: Map): mapBounddaries => ({
-  minX: map.items.reduce((p: MapItem, c: MapItem) => (p.coords.x <= c.coords.x ? p : c)).coords.x,
-  maxX: map.items.reduce((p: MapItem, c: MapItem) => (p.coords.x <= c.coords.x ? c : p)).coords.x,
-  minY: map.items.reduce((p: MapItem, c: MapItem) => (p.coords.y <= c.coords.y ? p : c)).coords.y,
-  maxY: map.items.reduce((p: MapItem, c: MapItem) => (p.coords.y <= c.coords.y ? c : p)).coords.y,
+const getBoundaries = (map: Map): mapBoundaries => ({
+  minX: map.items.reduce((p: MapItem, c: MapItem) => (p.slot.x <= c.slot.x ? p : c)).slot.x,
+  maxX: map.items.reduce((p: MapItem, c: MapItem) => (p.slot.x <= c.slot.x ? c : p)).slot.x,
+  minY: map.items.reduce((p: MapItem, c: MapItem) => (p.slot.y <= c.slot.y ? p : c)).slot.y,
+  maxY: map.items.reduce((p: MapItem, c: MapItem) => (p.slot.y <= c.slot.y ? c : p)).slot.y,
 })
 
 export const cardSelected = (G: GameState, ctx: Ctx, mapTile: boolean = false): boolean => {
@@ -24,18 +24,15 @@ export const cardSelected = (G: GameState, ctx: Ctx, mapTile: boolean = false): 
   if (player.selectedCard === undefined) {
     return false
   }
-  if (mapTile && getSelectedCardSides(G, ctx).length === 0) {
-    return false
-  }
-  return true
+  return !(mapTile && getSelectedCardSides(G, ctx).length === 0);
 }
 
-const getMapItemIndex = (coord: Coordinate, map: MapItem[]): number => {
-  return map.findIndex(item => item.coords.x === coord.x && item.coords.y === coord.y)
+const getMapItemIndex = (slot: Slot, map: MapItem[]): number => {
+  return map.findIndex(item => item.slot.x === slot.x && item.slot.y === slot.y)
 }
 
-const getMapItem = (coord: Coordinate, map: MapItem[]): MapItem | undefined => {
-  const index = getMapItemIndex(coord, map)
+const getMapItem = (slot: Slot, map: MapItem[]): MapItem | undefined => {
+  const index = getMapItemIndex(slot, map)
   if (index === -1) {
     return undefined
   }
@@ -60,7 +57,7 @@ const getSelectedCardSides = (G: GameState, ctx: Ctx): OpenSide[] => {
     return []
   }
 
-  const card: HandCard = player.cards[player.selectedCard]
+  const card: HandCard = player.hand[player.selectedCard]
   if ("openSides" in card) {
     return card.openSides
   }
@@ -68,7 +65,8 @@ const getSelectedCardSides = (G: GameState, ctx: Ctx): OpenSide[] => {
   return []
 }
 
-const getSiblings = (x: number, y: number): [Coordinate, Coordinate, Coordinate, Coordinate] => {
+const getSiblings = (slot: Slot): [Slot, Slot, Slot, Slot] => {
+  const {x, y} = slot
   return [
     { x: x, y: y - 1 },
     { x: x, y: y + 1 },
@@ -77,22 +75,22 @@ const getSiblings = (x: number, y: number): [Coordinate, Coordinate, Coordinate,
   ]
 }
 
-const hasSibling = (x: number, y: number, items: MapItem[]): boolean => {
-  return getSiblings(x, y).some((coord: Coordinate) => !freeCoordinate(coord.x, coord.y, items))
+const hasSibling = (slot: Slot, items: MapItem[]): boolean => {
+  return getSiblings(slot).some((slot: Slot) => !freeSlot(slot, items))
 }
 
-export const freeCoordinate = (x: number, y: number, items: MapItem[]): boolean => {
-  return !items.some((v: MapItem) => v.coords.x === x && v.coords.y === y)
+export const freeSlot = (slot: Slot, items: MapItem[]): boolean => {
+  return !items.some((v: MapItem) => v.slot.x === slot.x && v.slot.y === slot.y)
 }
 
-export const canPlaceCard = (G: GameState, ctx: Ctx, x: number, y: number): boolean => {
+export const canPlaceCard = (G: GameState, ctx: Ctx, slot: Slot): boolean => {
   if (!cardSelected(G, ctx, true)) {
     return false
   }
-  if (!hasSibling(x, y, G.map.items)) {
+  if (!hasSibling(slot, G.map.items)) {
     return false
   }
-  if (!freeCoordinate(x, y, G.map.items)) {
+  if (!freeSlot(slot, G.map.items)) {
     return false
   }
 
@@ -102,14 +100,11 @@ export const canPlaceCard = (G: GameState, ctx: Ctx, x: number, y: number): bool
   }
 
   const cardToPlace: MapItem = {
-    coords: {
-      x: x,
-      y: y,
-    },
+    slot: slot,
     card: selectedCard,
   }
 
-  const siblingCards = getSiblingCards(getSiblings(x, y), G.map.items)
+  const siblingCards = getSiblingCards(getSiblings(slot), G.map.items)
 
   const validSibling = (sibling: MapItem): boolean => {
     if ('uncovered' in sibling.card && !sibling.card.uncovered) {
@@ -122,53 +117,39 @@ export const canPlaceCard = (G: GameState, ctx: Ctx, x: number, y: number): bool
     return false
   }
 
-  if (!pathToZero({ x: x, y: y }, selectedCard.openSides, G.map.items, [])) {
+  if (!pathToZero(slot, selectedCard.openSides, G.map.items, [])) {
     return false
   }
 
   return siblingCards.every((item) => {
     const place: compareItem = {
       sides: cardToPlace.card.openSides,
-      coord: cardToPlace.coords,
+      slot: cardToPlace.slot,
     }
     const sibling: compareItem = {
       sides: item.card.openSides,
-      coord: item.coords,
+      slot: item.slot,
     }
     return cardCompatibility(place, sibling, true)
   })
 }
 
-export const updateEndTiles = (G: GameState, ctx: Ctx): GameState => {
-  G.map.items.map((i) => {
-    if (!('uncovered' in i.card)) {
-      return i
-    }
-    if (i.card.uncovered === true) {
-      return i
-    }
-    i.card.uncovered = pathToZero(i.coords, i.card.openSides, G.map.items)
-    return i
-  })
-  return G
-}
-
-const pathToZero = (coords: Coordinate, sides: OpenSide[], map: MapItem[], prev: Coordinate[] = []): boolean => {
-  if (coords.x === 0 && coords.y === 0) {
+export const pathToZero = (slot: Slot, sides: OpenSide[], map: MapItem[], prev: Slot[] = []): boolean => {
+  if (slot.x === 0 && slot.y === 0) {
     return true
   }
-  if (prev.some((v) => v.x === coords.x && v.y === coords.y)) {
+  if (prev.some((v) => v.x === slot.x && v.y === slot.y)) {
     return false
   }
-  prev.push(coords)
+  prev.push(slot)
 
   const paths = sides
     .map((side) => {
-      const coord = coordForSide(coords, side)
+      const resolvedSlot = slotForSide(slot, side)
       return {
         side: side,
-        coord: coord,
-        mapItem: getMapItem(coord, map),
+        slot: resolvedSlot,
+        mapItem: getMapItem(resolvedSlot, map),
       }
     })
     .filter((value) => {
@@ -180,34 +161,34 @@ const pathToZero = (coords: Coordinate, sides: OpenSide[], map: MapItem[], prev:
       return false
     }
 
-    const compat = cardCompatibility({ coord: coords, sides: sides }, mapItemToCompareItem(path.mapItem), false)
+    const compat = cardCompatibility({ slot: slot, sides: sides }, mapItemToCompareItem(path.mapItem), false)
 
     if (!compat) {
       return false
     }
 
-    return pathToZero(path.coord, path.mapItem.card.openSides, map, prev)
+    return pathToZero(path.slot, path.mapItem.card.openSides, map, prev)
   })
 }
 
 interface compareItem {
-  coord: Coordinate
+  slot: Slot
   sides: OpenSide[]
 }
 
 const mapItemToCompareItem = (item: MapItem): compareItem => {
-  return { coord: item.coords, sides: item.card.openSides }
+  return { slot: item.slot, sides: item.card.openSides }
 }
 
 const cardCompatibility = (a: compareItem, b: compareItem, noneAllowed: boolean = true): boolean => {
-  if (a.coord.x === b.coord.x) {
-    if (a.coord.y > b.coord.y) {
+  if (a.slot.x === b.slot.x) {
+    if (a.slot.y > b.slot.y) {
       return checkSides(b.sides, a.sides, OpenSide.Down, OpenSide.Up, noneAllowed)
     }
     return checkSides(b.sides, a.sides, OpenSide.Up, OpenSide.Down, noneAllowed)
   }
-  if (a.coord.y === b.coord.y) {
-    if (a.coord.x > b.coord.x) {
+  if (a.slot.y === b.slot.y) {
+    if (a.slot.x > b.slot.x) {
       return checkSides(b.sides, a.sides, OpenSide.Right, OpenSide.Left, noneAllowed)
     }
     return checkSides(b.sides, a.sides, OpenSide.Left, OpenSide.Right, noneAllowed)
@@ -220,21 +201,21 @@ const checkSides = (
   bSides: OpenSide[],
   aReq: OpenSide,
   bReq: OpenSide,
-  noneAllowd: boolean = true
+  noneAllowed: boolean = true
 ): boolean => {
   const both = aSides.includes(aReq) && bSides.includes(bReq)
   const none = !aSides.includes(aReq) && !bSides.includes(bReq)
-  return both || (none && noneAllowd)
+  return both || (none && noneAllowed)
 }
 
-const getSiblingCards = (siblings: Coordinate[], mapItems: MapItem[]): MapItem[] => {
+const getSiblingCards = (siblings: Slot[], mapItems: MapItem[]): MapItem[] => {
   const returnItems: MapItem[] = []
   siblings.forEach((sibling) => {
-    const matchedItem = mapItems.find((item) => item.coords.x === sibling.x && item.coords.y === sibling.y)
+    const matchedItem = mapItems.find((item) => item.slot.x === sibling.x && item.slot.y === sibling.y)
     if (matchedItem === undefined) {
       return
     }
-    if (matchedItem.card.type === CardType.End && hasSibling(matchedItem.coords.x, matchedItem.coords.y, mapItems)) {
+    if (matchedItem.card.type === CardType.End && hasSibling(matchedItem.slot, mapItems)) {
       return
     }
     returnItems.push(matchedItem)
@@ -248,16 +229,16 @@ export const goldDiscovered = (G: GameState): boolean => {
   if (goldCard === undefined) {
     return false
   }
-  return pathToZero(goldCard.coords, goldCard.card.openSides, G.map.items, [])
+  return pathToZero(goldCard.slot, goldCard.card.openSides, G.map.items, [])
 }
 
-export const removeCardFromMap = (G: GameState, ctx: Ctx, coord: Coordinate): GameState => {
-  const cardIndex = getMapItemIndex(coord, G.map.items)
+export const removeCardFromMap = (G: GameState, ctx: Ctx, slot: Slot): GameState => {
+  const cardIndex = getMapItemIndex(slot, G.map.items)
   G.map.items.splice(cardIndex, 1)
   return G
 }
 
-export const canPeekCard = (G: GameState, ctx: Ctx, coord: Coordinate): boolean => {
+export const canPeekCard = (G: GameState, ctx: Ctx, slot: Slot): boolean => {
   const selectedCard = getSelectedCard(G, ctx)
   if (selectedCard === undefined) {
     return false
@@ -268,19 +249,15 @@ export const canPeekCard = (G: GameState, ctx: Ctx, coord: Coordinate): boolean 
   if (selectedCard.action !== Action.Peek) {
     return false
   }
-  const mapCard = getMapItem(coord, G.map.items)
+  const mapCard = getMapItem(slot, G.map.items)
   if (mapCard === undefined) {
     return false
   }
 
-  if (mapCard.card.type === CardType.End) {
-    return true
-  }
-
-  return false
+  return mapCard.card.type === CardType.End;
 }
 
-export const canDestroyCard = (G: GameState, ctx: Ctx, coord: Coordinate): boolean => {
+export const canDestroyCard = (G: GameState, ctx: Ctx, slot: Slot): boolean => {
   const selectedCard = getSelectedCard(G, ctx)
   if (selectedCard === undefined) {
     return false
@@ -292,16 +269,12 @@ export const canDestroyCard = (G: GameState, ctx: Ctx, coord: Coordinate): boole
     return false
   }
 
-  const mapCard = getMapItem(coord, G.map.items)
+  const mapCard = getMapItem(slot, G.map.items)
   if (mapCard === undefined) {
     return false
   }
 
-  if (mapCard.card.type === CardType.Path) {
-    return true
-  }
-
-  return false
+  return mapCard.card.type === CardType.Path;
 }
 
 export default getBoundaries

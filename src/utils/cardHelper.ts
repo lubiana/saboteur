@@ -1,14 +1,14 @@
-import { Coordinate } from '../types/Map'
+import { Slot } from '../types/Map'
 import { OpenSide, HandCard, CardType, Action } from '../types/Cards'
 import GameState from '../types/GameState'
 import { Ctx } from 'boardgame.io'
 import Player from '../types/Player'
 
-export const coordForSide = (coords: Coordinate, side: OpenSide): Coordinate => {
-    if (side === OpenSide.Up) return { x: coords.x, y: coords.y - 1 }
-    if (side === OpenSide.Down) return { x: coords.x, y: coords.y + 1 }
-    if (side === OpenSide.Left) return { x: coords.x - 1, y: coords.y }
-    if (side === OpenSide.Right) return { x: coords.x + 1, y: coords.y }
+export const slotForSide = (slot: Slot, side: OpenSide): Slot => {
+    if (side === OpenSide.Up) return { x: slot.x, y: slot.y - 1 }
+    if (side === OpenSide.Down) return { x: slot.x, y: slot.y + 1 }
+    if (side === OpenSide.Left) return { x: slot.x - 1, y: slot.y }
+    if (side === OpenSide.Right) return { x: slot.x + 1, y: slot.y }
     throw (new Error('Invalid Input'))
 }
 
@@ -26,7 +26,7 @@ export const getSelectedCard = (G: GameState, ctx: Ctx): HandCard | undefined =>
         return undefined
     }
 
-    return player.cards[player.selectedCard]
+    return player.hand[player.selectedCard]
 }
 
 export const getSelectedCardType = (G: GameState, ctx: Ctx): CardType | undefined => {

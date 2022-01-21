@@ -9,28 +9,28 @@ const mapGen = (endTiles: [EndTile, EndTile, EndTile]): Map => {
     deadEnd: false,
   }
   items.push({
-    coords: {
+    slot: {
       x: 0,
       y: 0,
     },
     card: startTile,
   })
   items.push({
-    coords: {
+    slot: {
       x: 8,
       y: 0,
     },
     card: endTiles[0],
   })
   items.push({
-    coords: {
+    slot: {
       x: 8,
       y: 2,
     },
     card: endTiles[1],
   })
   items.push({
-    coords: {
+    slot: {
       x: 8,
       y: -2,
     },
