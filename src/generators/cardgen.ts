@@ -6,40 +6,27 @@ import {
   MapActionCard,
   OpenSide,
   PathTile,
+  SabCard,
   Tool,
-  ToolAction,
-  ToolActionCard
+  ToolAction
 } from "../types/Cards"
 
-const pathTileGenerator = (amount: number, deadEnd: boolean, sides: OpenSide[]): PathTile[] => {
-  const pathTiles: PathTile[] = []
+const repeat = <T extends SabCard>(amount: number, card: T): T[] => {
+  const cards: T[] = []
   for (let index = 0; index < amount; index++) {
-    pathTiles.push({
-      type: "Path",
-      openSides: sides,
-      deadEnd,
-    })
-  }
-  return pathTiles
-}
-
-const mapActionCard = (amount: number, action: MapAction): MapActionCard[] => {
-  const cards: MapActionCard[] = []
-
-  for (let index = 0; index < amount; index++) {
-    cards.push({type: "Action", action})
+    cards.push({...card})
   }
   return cards
 }
 
-const toolActionCard = (amount: number, action: ToolAction, tools: Tool[] = []): ActionCard[] => {
-  const cards: ToolActionCard[] = []
+const pathCard = (amount: number, deadEnd: boolean, sides: OpenSide[]): PathTile[] =>
+  repeat(amount, {type: "Path", openSides: sides, deadEnd})
 
-  for (let index = 0; index < amount; index++) {
-    cards.push({type: "Action", action, tools})
-  }
-  return cards
-}
+const mapActionCard = (amount: number, action: MapAction): MapActionCard[] =>
+  repeat(amount, {type: "Action", action})
+
+const toolActionCard = (amount: number, action: ToolAction, tools: Tool[] = []): ActionCard[] =>
+  repeat(amount, {type: "Action", action, tools})
 
 const actionCards = (): ActionCard[] => {
   const actionCards: ActionCard[] = []
@@ -60,23 +47,23 @@ const actionCards = (): ActionCard[] => {
 const pathTiles = (): PathTile[] => {
   const pathTiles: PathTile[] = []
   // deadEnds
-  pathTiles.push(...pathTileGenerator(1, true, ["Left", "Up"]))
-  pathTiles.push(...pathTileGenerator(1, true, ["Down", "Up"]))
-  pathTiles.push(...pathTileGenerator(1, true, ["Down", "Left"]))
-  pathTiles.push(...pathTileGenerator(1, true, ["Down", "Left", "Right", "Up"]))
-  pathTiles.push(...pathTileGenerator(1, true, ["Left"]))
-  pathTiles.push(...pathTileGenerator(1, true, ["Down"]))
-  pathTiles.push(...pathTileGenerator(1, true, ["Left", "Right"]))
-  pathTiles.push(...pathTileGenerator(1, true, ["Left", "Right", "Up"]))
-  pathTiles.push(...pathTileGenerator(1, true, ["Left", "Down", "Up"]))
+  pathTiles.push(...pathCard(1, true, ["Left", "Up"]))
+  pathTiles.push(...pathCard(1, true, ["Down", "Up"]))
+  pathTiles.push(...pathCard(1, true, ["Down", "Left"]))
+  pathTiles.push(...pathCard(1, true, ["Down", "Left", "Right", "Up"]))
+  pathTiles.push(...pathCard(1, true, ["Left"]))
+  pathTiles.push(...pathCard(1, true, ["Down"]))
+  pathTiles.push(...pathCard(1, true, ["Left", "Right"]))
+  pathTiles.push(...pathCard(1, true, ["Left", "Right", "Up"]))
+  pathTiles.push(...pathCard(1, true, ["Left", "Down", "Up"]))
   // normalPaths
-  pathTiles.push(...pathTileGenerator(3, false, ["Left", "Right"]))
-  pathTiles.push(...pathTileGenerator(4, false, ["Down", "Up"]))
-  pathTiles.push(...pathTileGenerator(5, false, ["Down", "Left"]))
-  pathTiles.push(...pathTileGenerator(5, false, ["Left", "Up"]))
-  pathTiles.push(...pathTileGenerator(5, false, ["Down", "Up", "Left"]))
-  pathTiles.push(...pathTileGenerator(5, false, ["Down", "Right", "Left"]))
-  pathTiles.push(...pathTileGenerator(5, false, ["Down", "Right", "Left", "Up"]))
+  pathTiles.push(...pathCard(3, false, ["Left", "Right"]))
+  pathTiles.push(...pathCard(4, false, ["Down", "Up"]))
+  pathTiles.push(...pathCard(5, false, ["Down", "Left"]))
+  pathTiles.push(...pathCard(5, false, ["Left", "Up"]))
+  pathTiles.push(...pathCard(5, false, ["Down", "Up", "Left"]))
+  pathTiles.push(...pathCard(5, false, ["Down", "Right", "Left"]))
+  pathTiles.push(...pathCard(5, false, ["Down", "Right", "Left", "Up"]))
   return pathTiles
 }
 

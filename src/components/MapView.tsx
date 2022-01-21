@@ -6,6 +6,7 @@ import {emptyCard} from "../generators/cardgen"
 import SaboteurCard from "./SaboteurCard"
 import GameState from "../types/GameState"
 import {Ctx} from "boardgame.io"
+import {isEndTile} from "../types/guards";
 
 interface MapViewProps {
   G: GameState
@@ -32,11 +33,11 @@ const getRows = (map: Map): number[] => {
 }
 
 const getCardForSlot = (x: number, y: number, map: Map, peekedSlots: Slot[] = []): SabCard => {
-  const card = map.items.find((item: MapItem) => item.slot.x === x && item.slot.y === y)
+  const item = map.items.find(({slot}: MapItem) => slot.x === x && slot.y === y)
 
-  if (card) {
-    const clone = {...card.card}
-    if (peekedSlots.some(v => v.x === x && v.y === y) && 'uncovered' in clone) {
+  if (item) {
+    const clone = {...item.card}
+    if (peekedSlots.some(v => v.x === x && v.y === y) && isEndTile(clone)) {
       clone.uncovered = true
     }
     return clone
