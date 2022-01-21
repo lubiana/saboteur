@@ -61,7 +61,7 @@ const MapView: React.FC<MapViewProps> = ({G, ctx, moves}) => {
     canDestroyCard(G, ctx, slot) ||
     canPeekCard(G, ctx, slot)
 
-  const onClick = (slot: Slot) => {
+  const handleClick = (slot: Slot) => {
     if (canPlaceCard(G, ctx, slot)) {
       moves.placeCard(slot)
     } else if (canDestroyCard(G, ctx, slot)) {
@@ -81,8 +81,8 @@ const MapView: React.FC<MapViewProps> = ({G, ctx, moves}) => {
               <td key={xIndex}>
                 <SaboteurCard
                   card={getCardForSlot(x, y, G.map, playerPeeked)}
-                  elevation={canClick({x: x, y: y}) ? 5 : 0}
-                  onClick={() => onClick({x: x, y: y})}
+                  elevation={canClick({x, y}) ? 5 : 0}
+                  onClick={() => handleClick({x, y})}
                 />
               </td>
             ))}

@@ -74,12 +74,14 @@ type IMapActionCard<A extends MapAction> = IActionCard<A>
 
 export type BlockCard = IToolCard<Action.Block>
 export type UnblockCard = IToolCard<Action.Unblock>
+export type ToolActionCard = BlockCard | UnblockCard
+
 export type PeekCard = IMapActionCard<Action.Peek>
 export type DestroyCard = IMapActionCard<Action.Destroy>
-
 export type MapActionCard = PeekCard | DestroyCard
-export type ToolActionCard = BlockCard | UnblockCard
+
 export type ActionCard = ToolActionCard | PeekCard | DestroyCard
+
 export type HandCard = ActionCard | PathTile
 export type MapCard = StartTile | EndTile | PathTile
 export type SabCard = HandCard | RoleCard | MapCard
