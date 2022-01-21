@@ -9,7 +9,7 @@ import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import Divider from "@material-ui/core/Divider"
 import Player from "../types/Player"
 import GameState from "../types/GameState"
-import { BlockItem } from "../types/Cards"
+import { Tool } from "../types/Cards"
 import { cardSelected } from "../utils/mapHelper"
 import { selectedBlock, selectedUnblock } from '../utils/cardHelper'
 
@@ -48,13 +48,13 @@ const canClick = (G: GameState, ctx: Ctx, index: number): boolean => {
 const playerText = (player: Player): string => {
   let output: string = player.name
   const items = [
-    { l: "P", b: BlockItem.Pickaxe },
-    { l: "C", b: BlockItem.Cart },
-    { l: "L", b: BlockItem.Lamp },
+    { l: "P", b: Tool.Pickaxe },
+    { l: "C", b: Tool.Cart },
+    { l: "L", b: Tool.Lamp },
   ]
 
   items.forEach((item: any) => {
-    const amount: number = player.blockers.filter((blocker: BlockItem) => blocker === item.b).length
+    const amount: number = player.blockers.filter((blocker: Tool) => blocker === item.b).length
     output = output.concat(` (${item.l}:${amount.toString()})`)
   })
 

@@ -1,9 +1,9 @@
-import { Map, MapItem } from "../types/Map"
-import { CardType, EndTile, OpenSide, MapTile } from "../types/Cards"
+import {Map, MapItem} from "../types/Map"
+import {CardType, EndTile, MapCard, OpenSide} from "../types/Cards"
 
 const mapGen = (endTiles: [EndTile, EndTile, EndTile]): Map => {
   const items: MapItem[] = []
-  const startTile: MapTile = {
+  const startTile: MapCard = {
     type: CardType.Start,
     openSides: [OpenSide.Left, OpenSide.Right, OpenSide.Down, OpenSide.Up],
     deadEnd: false,

@@ -1,9 +1,9 @@
 import React, {useEffect, useRef} from "react"
-import {EndTile, MapTile, OpenSide} from "../types/Cards"
-import {isEndTile, isMapTile, isPathTile} from "../types/guards";
+import {EndTile, MapCard, OpenSide} from "../types/Cards"
+import {isEndTile, isMapCard, isPathTile} from "../types/guards";
 
 interface MapTileCanvasProps {
-  card: MapTile
+  card: MapCard
 }
 
 const drawForNormal = (ctx: CanvasRenderingContext2D, side: OpenSide): void => {
@@ -56,7 +56,7 @@ const drawEndCard = (ctx: CanvasRenderingContext2D, card: EndTile) => {
   ctx.fillRect(20, 30, 10, 10)
 }
 
-function drawMapTile(card: MapTile, context: CanvasRenderingContext2D) {
+function drawMapTile(card: MapCard, context: CanvasRenderingContext2D) {
   card.openSides.forEach((side: OpenSide) => {
     if (card.deadEnd) {
       drawForDeadEnd(context, side)
@@ -83,7 +83,7 @@ const MapTileCanvas: React.FC<MapTileCanvasProps> = ({card}) => {
     context.clearRect(0, 0, context.canvas.width, context.canvas.height)
     context.fillStyle = isPathTile(card) ? "#000" : "#060"
 
-    if (isMapTile(card)) {
+    if (isMapCard(card)) {
       if (isEndTile(card)) {
         drawEndCard(context, card)
       } else {

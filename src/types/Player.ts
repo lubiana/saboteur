@@ -1,4 +1,4 @@
-import { Role, HandCard, BlockItem } from "./Cards"
+import { Role, HandCard, Tool } from "./Cards"
 import { Slot } from './Map'
 
 export default interface Player {
@@ -7,7 +7,7 @@ export default interface Player {
   gold: number
   role: Role | null
   hand: HandCard[]
-  blockers: BlockItem[]
+  blockers: Tool[]
   selectedCard?: number
   peekedSlot: Slot[]
 }

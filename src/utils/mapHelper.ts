@@ -4,7 +4,7 @@ import {Ctx} from "boardgame.io"
 import Player from "../types/Player"
 import {OpenSide} from '../types/Cards'
 import {getSelectedCard, selectedDestroy, selectedPeek, slotForSide} from './cardHelper'
-import {isEndTile, isMapTile, isPathTile} from "../types/guards";
+import {isEndTile, isMapCard, isPathTile} from "../types/guards";
 
 export interface MapBoundaries {
   minX: number
@@ -42,7 +42,7 @@ const getMapItem = (slot: Slot, map: MapItem[]): MapItem | undefined => {
 
 const getSelectedCardSides = (G: GameState, ctx: Ctx): OpenSide[] => {
   const card = getSelectedCard(G, ctx)
-  return isMapTile(card) ? card.openSides : []
+  return isMapCard(card) ? card.openSides : []
 }
 
 const getSiblings = (slot: Slot): [Slot, Slot, Slot, Slot] => {

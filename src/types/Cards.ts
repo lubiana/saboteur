@@ -1,7 +1,6 @@
 export enum CardType {
   Action = "Action",
   End = "End",
-  Gold = "Gold",
   Path = "Path",
   Role = "Role",
   Start = "Start",
@@ -14,7 +13,7 @@ export enum Action {
   Destroy = "Destroy",
 }
 
-export enum BlockItem {
+export enum Tool {
   Pickaxe = "Pickaxe",
   Cart = "Cart",
   Lamp = "Lamp",
@@ -35,45 +34,52 @@ export enum OpenSide {
 
 export type GoldAmount = 0 | 1 | 2 | 3
 
-export interface GameCard {
-  type: CardType
+export type GameCard<T extends CardType> = {
+  readonly type: T
 }
 
-export interface RoleCard extends GameCard {
-  type: CardType.Role
-  role: Role
+export type RoleCard = GameCard<CardType.Role> & {
+  readonly role: Role
 }
 
-export const mapTileTypes: readonly CardType[] =
-    [CardType.Path, CardType.End, CardType.Start] as const
-
+const mapTileTypes: readonly CardType[] =
+  [CardType.Path, CardType.End, CardType.Start] as const
 type MapTileType = typeof mapTileTypes[number];
 
-export interface MapTile extends GameCard {
-  type: MapTileType
+type MapTile<T extends MapTileType> = GameCard<T> & {
   openSides: OpenSide[]
-  deadEnd: boolean
+  readonly deadEnd: boolean
 }
 
-export interface PathTile extends MapTile {
-  type: CardType.Path
-}
-
-export interface EndTile extends MapTile {
-  type: CardType.End
-  gold: boolean
+export type PathTile = MapTile<CardType.Path>
+export type StartTile = MapTile<CardType.Start>
+export type EndTile = MapTile<CardType.End> & {
+  readonly gold: boolean
   uncovered: boolean
 }
 
-export interface ActionCard {
-  type: CardType.Action
-  action: Action
+type IActionCard<A extends Action> = GameCard<CardType.Action> & {
+  readonly action: A
 }
 
-export interface BlockCard extends ActionCard {
-  blockItems: BlockItem[]
+export type ToolAction = Action.Block | Action.Unblock;
+
+export type MapAction = Action.Peek | Action.Destroy;
+
+type IToolCard<A extends ToolAction> = IActionCard<A> & {
+  readonly tools: Tool[]
 }
 
+type IMapActionCard<A extends MapAction> = IActionCard<A>
+
+export type BlockCard = IToolCard<Action.Block>
+export type UnblockCard = IToolCard<Action.Unblock>
+export type PeekCard = IMapActionCard<Action.Peek>
+export type DestroyCard = IMapActionCard<Action.Destroy>
+
+export type MapActionCard = PeekCard | DestroyCard
+export type ToolActionCard = BlockCard | UnblockCard
+export type ActionCard = ToolActionCard | PeekCard | DestroyCard
 export type HandCard = ActionCard | PathTile
-export type SabCard = HandCard | RoleCard | MapTile
-export type MapCard = PathTile | EndTile | MapTile
+export type MapCard = StartTile | EndTile | PathTile
+export type SabCard = HandCard | RoleCard | MapCard

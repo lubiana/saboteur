@@ -3,7 +3,7 @@ import {Action, HandCard, OpenSide} from '../types/Cards'
 import GameState from '../types/GameState'
 import {Ctx} from 'boardgame.io'
 import Player from '../types/Player'
-import {isActionCard, isBlockCard} from "../types/guards";
+import {isActionCard, isToolActionCard} from "../types/guards";
 
 export const slotForSide = (slot: Slot, side: OpenSide): Slot => {
     switch (side) {
@@ -33,12 +33,12 @@ export const getSelectedCard = (G: GameState, ctx: Ctx): HandCard | undefined =>
 
 export const selectedBlock = (G: GameState, ctx: Ctx): boolean => {
     const card = getSelectedCard(G, ctx)
-    return isBlockCard(card) && card.action === Action.Block
+    return isToolActionCard(card) && card.action === Action.Block
 }
 
 export const selectedUnblock = (G: GameState, ctx: Ctx): boolean => {
     const card = getSelectedCard(G, ctx)
-    return isBlockCard(card) && card.action === Action.Unblock
+    return isToolActionCard(card) && card.action === Action.Unblock
 }
 
 export const selectedPeek = (G: GameState, ctx: Ctx): boolean => {
