@@ -2,7 +2,7 @@ import {Map, MapItem, Slot} from '../types/Map'
 import GameState from '../types/GameState'
 import {Ctx} from "boardgame.io"
 import Player from "../types/Player"
-import {CardType, OpenSide} from '../types/Cards'
+import {OpenSide} from '../types/Cards'
 import {getSelectedCard, selectedDestroy, selectedPeek, slotForSide} from './cardHelper'
 import {isEndTile, isMapTile, isPathTile} from "../types/guards";
 
