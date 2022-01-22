@@ -83,7 +83,7 @@ const MapView: React.FC<MapViewProps> = ({G, ctx, moves}) => {
                 <SaboteurCard
                   card={getCardForSlot(x, y, G.map, playerPeeked)}
                   elevation={canClick({x, y}) ? 5 : 0}
-                  onClick={() => handleClick({x, y})}
+                  onClick={() => canClick({x, y}) && handleClick({x, y})}
                 />
               </td>
             ))}

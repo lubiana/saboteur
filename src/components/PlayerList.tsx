@@ -64,8 +64,8 @@ const PlayerList: React.FC<PlayerListProps> = ({G, ctx, moves}) => {
     const player = G.players[index]
     const card = selected(G, ctx)
 
-    return (isBlockCard(card) && canBlock(card, tool, player))
-      || (isUnblockCard(card) && canUnblock(card, tool, player))
+    return (isBlockCard(card) && canBlock(card, tool, player)) ||
+      (isUnblockCard(card) && canUnblock(card, tool, player))
   }
 
   return (

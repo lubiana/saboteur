@@ -34,8 +34,8 @@ const cardDisplay = (card: SabCard) => {
   }
 }
 
-const SaboteurCard: React.FC<SaboteurCardProps> = ({card, onClick, elevation}) => (
-  <Paper onClick={onClick} elevation={elevation ? elevation : 0} >
+const SaboteurCard: React.FC<SaboteurCardProps> = ({card, onClick, elevation = 0}) => (
+  <Paper onClick={onClick} elevation={elevation}>
     <div style={{width: "50px", height: "70px"}}>{cardDisplay(card)}</div>
   </Paper>
 )
