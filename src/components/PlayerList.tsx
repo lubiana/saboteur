@@ -87,6 +87,7 @@ const PlayerList: React.FC<PlayerListProps> = ({G, ctx, moves}) => {
         <List>
           {G.players.map((player: Player) => (
             <>
+              <Divider/>
               <ListItem
                 key={player.index}
                 selected={canClick(G, ctx)}
@@ -112,7 +113,6 @@ const PlayerList: React.FC<PlayerListProps> = ({G, ctx, moves}) => {
                   />
                 )}
               </ListItem>
-              <Divider/>
             </>
           ))}
         </List>
