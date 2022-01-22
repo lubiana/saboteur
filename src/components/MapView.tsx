@@ -75,11 +75,11 @@ const MapView: React.FC<MapViewProps> = ({G, ctx, moves}) => {
   return (
     <div>
       <table>
-        <tbody>
+        <tbody style={{background:"lightgray"}}>
         {getRows(G.map).map((y: number, yIndex: number) => (
           <tr key={yIndex}>
             {getColumns(G.map).map((x: number, xIndex: number) => (
-              <td key={xIndex} style={{background:"lightgray"}}>
+              <td key={xIndex} >
                 <SaboteurCard
                   card={getCardForSlot(x, y, G.map, playerPeeked)}
                   elevation={canClick({x, y}) ? 5 : 0}
