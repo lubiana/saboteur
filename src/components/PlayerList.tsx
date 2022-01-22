@@ -4,10 +4,12 @@ import Player from "../types/Player"
 import GameState from "../types/GameState"
 import {Tool, tools} from "../types/Cards"
 import {cardSelected} from "../utils/mapHelper"
-import {selected} from '../utils/cardHelper'
-import {isBlockCard, isToolActionCard, isUnblockCard} from "../types/guards";
+import {canBlock, canUnblock, selected} from '../utils/cardHelper'
+import {isBlockCard, isUnblockCard} from "../types/guards";
 import {
-  Avatar, Badge, Chip,
+  Avatar,
+  Badge,
+  Chip,
   Divider,
   Drawer,
   List,
@@ -42,23 +44,28 @@ interface PlayerListProps {
   moves: any
 }
 
-const drawPileText = (amount: number): string => "Drawpile (" + amount + ")"
-
-const discardPileText = (amount: number): string => "Discardpile (" + amount + ")"
-
-const canClick = (G: GameState, ctx: Ctx): boolean =>
-  isToolActionCard(selected(G, ctx))
+const drawPileText = (amount: number): string => "Draw Pile (" + amount + ")"
+const discardPileText = (amount: number): string => "Discard Pile (" + amount + ")"
 
 const PlayerList: React.FC<PlayerListProps> = ({G, ctx, moves}) => {
   const classes = useStyles()
 
   const onToolClick = (index: number, tool: Tool) => {
     const card = selected(G, ctx)
+
     if (isBlockCard(card)) {
       moves.blockPlayer(index, tool)
     } else if (isUnblockCard(card)) {
       moves.unblockPlayer(index, tool)
     }
+  }
+
+  const isActionable = (index: number, tool: Tool) => {
+    const player = G.players[index]
+    const card = selected(G, ctx)
+
+    return (isBlockCard(card) && canBlock(card, tool, player))
+      || (isUnblockCard(card) && canUnblock(card, tool, player))
   }
 
   return (
@@ -86,12 +93,9 @@ const PlayerList: React.FC<PlayerListProps> = ({G, ctx, moves}) => {
         </List>
         <List>
           {G.players.map((player: Player) => (
-            <>
+            <div key={player.index}>
               <Divider/>
-              <ListItem
-                key={player.index}
-                selected={canClick(G, ctx)}
-              >
+              <ListItem>
                 {player.index === Number(ctx.currentPlayer) ? (
                   <ListItemAvatar>
                     <Badge color="primary" overlap="circular" variant="dot">
@@ -107,13 +111,14 @@ const PlayerList: React.FC<PlayerListProps> = ({G, ctx, moves}) => {
                   <Chip
                     key={tool}
                     label={tool}
-                    variant={player.blockers[tool] ? "filled" : "outlined"}
+                    variant={isActionable(player.index, tool) ? "filled" : "outlined"}
+                    color={player.blockers[tool] ? "error" : "success"}
                     size="small"
-                    onClick={() => onToolClick(player.index, tool)}
+                    onClick={() => isActionable(player.index, tool) && onToolClick(player.index, tool)}
                   />
                 )}
               </ListItem>
-            </>
+            </div>
           ))}
         </List>
       </div>

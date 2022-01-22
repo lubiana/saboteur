@@ -1,6 +1,6 @@
 import GameState from "../../../types/GameState";
 import {Ctx} from "boardgame.io";
-import {selected} from "../../../utils/cardHelper";
+import {canUnblock, selected} from "../../../utils/cardHelper";
 import {INVALID_MOVE} from "boardgame.io/core";
 import {discardCard} from "./index";
 import {isUnblockCard} from "../../../types/guards";
@@ -10,7 +10,7 @@ const unblockPlayer = (G: GameState, ctx: Ctx, playerId: number, tool: Tool) => 
   const player = G.players[playerId];
   const card = selected(G, ctx)
 
-  if (isUnblockCard(card) && player.blockers[tool] && card.tools.includes(tool)) {
+  if (isUnblockCard(card) && canUnblock(card, tool, player)) {
     player.blockers[tool] = false
     discardCard(G, ctx)
   } else {
