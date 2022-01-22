@@ -1,7 +1,6 @@
 import GameState from "../../../types/GameState";
 import {Ctx} from "boardgame.io";
 import {INVALID_MOVE} from "boardgame.io/core";
-import {endTurn} from "../../../utils/contextHelper";
 import {Slot} from "../../../types/Map";
 import {isPathTile} from "../../../types/guards";
 import {selected} from "../../../utils/cardHelper";
@@ -24,7 +23,7 @@ const placeCard = (G: GameState, ctx: Ctx, slot: Slot) => {
       player.hand.push(playerCard)
     }
 
-    endTurn(ctx)
+    ctx.events?.endTurn()
   } else {
     return INVALID_MOVE
   }

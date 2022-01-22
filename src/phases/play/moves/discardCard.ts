@@ -2,7 +2,6 @@ import GameState from "../../../types/GameState";
 import {Ctx} from "boardgame.io";
 import {INVALID_MOVE} from "boardgame.io/core";
 import {HandCard} from "../../../types/Cards";
-import {endTurn} from "../../../utils/contextHelper";
 
 const discardCard = (G: GameState, ctx: Ctx) => {
     const currentPlayer = Number(ctx.currentPlayer)
@@ -19,7 +18,7 @@ const discardCard = (G: GameState, ctx: Ctx) => {
     if (playerCard !== undefined) {
         G.players[currentPlayer].hand.push(playerCard)
     }
-    endTurn(ctx)
+    ctx.events?.endTurn()
 }
 
 export default discardCard
