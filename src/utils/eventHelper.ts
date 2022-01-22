@@ -1,7 +1,4 @@
 import {Ctx} from "boardgame.io"
 
-export const endTurn = (c: Ctx) => {
-  if (c.events !== undefined && c.events.endTurn !== undefined) {
-    c.events.endTurn()
-  }
-}
+export const endTurn = (ctx: Ctx) =>
+  ctx.events && ctx.events.endTurn && ctx.events.endTurn()

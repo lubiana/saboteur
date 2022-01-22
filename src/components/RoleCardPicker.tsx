@@ -13,10 +13,9 @@ const RoleCardPicker: React.FC<RoleCardPickerProps> = ({ roleCards, moves }) => 
     {roleCards.map((card: RoleCard, index: number) => (
       <Grid item key={index}>
         <SaboteurCard
+          elevation={1}
           card={{ type: "Role", role: "?" }}
-          onClick={() => {
-            moves.pickRoleCard(index)
-          }}
+          onClick={() => moves.pickRoleCard(index)}
         />
       </Grid>
     ))}
